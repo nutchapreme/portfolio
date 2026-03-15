@@ -28,6 +28,17 @@ nav.scrolled{border-color:var(--line)}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
 .nav-links a:hover{color:var(--accent2)}
 
+.bar{display:block;width:22px;height:1.5px;background:var(--muted);transition:background .2s}
+#menuBtn:hover .bar{background:var(--accent2)}
+
+.mob-link{color:var(--muted);text-decoration:none;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:14px 0;border-bottom:1px solid var(--line);display:block;transition:color .2s}
+.mob-link:hover{color:var(--accent2)}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  #menuBtn{display:flex!important}
+}
+
 .hero{min-height:100vh;display:grid;grid-template-columns:1fr 400px;align-items:end;padding:0 52px 72px;position:relative;overflow:hidden;gap:40px}
 .hero-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(61,155,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(61,155,255,.03) 1px,transparent 1px);background-size:64px 64px;animation:gridScroll 30s linear infinite}
 @keyframes gridScroll{from{transform:translateY(0)}to{transform:translateY(64px)}}
@@ -182,6 +193,15 @@ footer p{font-size:11px;letter-spacing:.06em;color:var(--muted)}
   .hero{grid-template-columns:1fr;padding:120px 24px 52px}
   .hero-astronaut{height:300px;margin:0 auto}
   .cad-grid{grid-template-columns:1fr}
+
+
+  #astCanvas{width:220px!important;height:280px!important}
+  .hero-astronaut{height:220px}
+}
+
+@media(max-width:480px){
+  #astCanvas{width:160px!important;height:200px!important}
+  .hero-astronaut{height:160px}
 }
 @media(max-width:768px){
   nav{padding:18px 24px}.nav-links{display:none}
@@ -259,6 +279,21 @@ html {
     <li><a href="#experience">Experience</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <!-- menu -->
+  <button id="menuBtn" style="display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </button>
+
+  <!-- Mobile dropdown -->
+  <div id="mobileMenu" style="display:none;position:fixed;top:72px;left:0;right:0;background:rgba(4,12,24,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(61,155,255,.12);z-index:199;padding:20px 24px;flex-direction:column;gap:2px">
+    <a href="#about"      class="mob-link">About</a>
+    <a href="#projects"   class="mob-link">Project</a>
+    <a href="#design"     class="mob-link">Design</a>
+    <a href="#experience" class="mob-link">Experience</a>
+    <a href="#contact"    class="mob-link">Contact</a>
+  </div>
 </nav>
 
 <section class="hero" id="home">
@@ -517,6 +552,23 @@ document.querySelectorAll('a,button,.proj-card,.contact-card,.art-circle,.poster
 // Nav
 const nav = document.getElementById('nav');
 window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>50),{passive:true});
+
+const menuBtn   = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+let menuOpen = false;
+
+menuBtn.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  mobileMenu.style.display = menuOpen ? 'flex' : 'none';
+});
+
+// Close when a link is clicked
+document.querySelectorAll('.mob-link').forEach(link => {
+  link.addEventListener('click', () => {
+    menuOpen = false;
+    mobileMenu.style.display = 'none';
+  });
+});
 
 // Reveal
 const io = new IntersectionObserver(entries=>{
