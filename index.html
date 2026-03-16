@@ -743,7 +743,7 @@ mq.innerHTML += mq.innerHTML;
 
   // Wheel fallback — works great inside the widget itself
   window.addEventListener('wheel', (e) => {
-    scrollRY += e.deltaY * 0.004;
+    scrollRY += e.deltaY * 0.002;
   }, { passive: true });
 
   let t = 0;
@@ -924,10 +924,13 @@ document.addEventListener('keydown', e => {
 
     const FW = 1440;
     const FH = 900;
-    const offsetX = (W - FW) * 0.77; // 0.77 matches your nx positions on the right side
+    const offsetX = (W - FW) * 0.77;
     pts = {};
     raw.forEach(p=>{ pts[p.id]={...p, x:p.nx*FW + offsetX, y:p.ny*FH}; });
     all = Object.values(pts);
+
+    // Lower opacity on mobile
+    canvas.style.opacity = W < 768 ? '0.15' : '1';
   }
 
   window.addEventListener('resize', resize);
