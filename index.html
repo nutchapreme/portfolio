@@ -780,6 +780,7 @@ const PROJECTS = [
     tags: ['Altium Designer', 'PCB Layout & Routing', 'Schematic Design'],
     desc: 'Designed a 2-layer STM32F405 development board in Altium Designer with breakout headers for SPI, I²C, UART, and ADC peripherals. Implemented a 24V→5V buck and 3.3V LDO power system for reliable MCU power delivery and integrated USB-C with ESD protection and differential pair routing, along with SWD debugging support.',
     img: './pcb.png',
+    imgBack: './pcb_back.png',
     highlights: [
       { n:'01', t:'<strong>Power architecture</strong> — 24V→5V buck converter and 3.3V LDO designed for stable MCU and peripheral power delivery.' },
 
@@ -848,7 +849,10 @@ const overlayHTML = `
     <div id="projTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px"></div>
     <div style="display:flex;gap:80px;align-items:flex-start;margin-bottom:48px">
       <p id="projDesc" style="color:#4d6a90;font-size:13px;line-height:1.9;max-width:480px"></p>
-      <img id="projImg" style="width:320px;height:auto;object-fit:contain;flex-shrink:0;display:none"/>
+      <div style="display:flex;gap:12px;flex-shrink:0">
+        <img id="projImg" style="width:320px;height:auto;object-fit:contain;display:none"/>
+        <img id="projImgBack" style="width:320px;height:auto;object-fit:contain;display:none"/>
+      </div>
     </div>
     <p style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#3d9bff;margin-bottom:12px">Key highlights</p>
     <div id="projHL" style="display:flex;flex-direction:column;gap:2px"></div>
@@ -870,9 +874,13 @@ document.querySelectorAll('.proj-card').forEach(card => {
     document.getElementById('projTitle').innerHTML   = p.title;
     document.getElementById('projDesc').textContent  = p.desc;
     
+    //pcb images
     const imgEl = document.getElementById('projImg');
     imgEl.src = p.img || '';
     imgEl.style.display = p.img ? 'block' : 'none';
+    const imgBackEl = document.getElementById('projImgBack');
+    imgBackEl.src = p.imgBack || '';
+    imgBackEl.style.display = p.imgBack ? 'block' : 'none';
     document.getElementById('projTags').innerHTML    = p.tags.map(t => `<span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(61,155,255,.2);color:#3d9bff">${t}</span>`).join('') + (p.link ? `<a href="${p.link}" target="_blank" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(255,255,255,.2);color:#ffffff;text-decoration:none;transition:background .2s" onmouseenter="this.style.background='rgba(255,255,255,.08)'" onmouseleave="this.style.background='none'">🔗 ${p.linkLabel}</a>` : '');
     document.getElementById('projHL').innerHTML      = p.highlights.map(h =>
       `<div style="display:flex;gap:14px;padding:16px 20px;background:#071525;border:1px solid rgba(61,155,255,.1)">
