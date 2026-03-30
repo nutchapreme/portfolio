@@ -251,7 +251,7 @@ footer p{font-size:11px;letter-spacing:.06em;color:var(--muted)}
 
 #projBack:hover {
   color: var(--accent2);
-  gap: 14px;  /* makes the ← slide left on hover */
+  gap: 14px;  /* makes the ← slide left when hover */
 }
 body {
   overflow-x: hidden;
@@ -552,7 +552,7 @@ html {
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// Cursor
+// cursor
 const cur = document.getElementById('cur');
 document.addEventListener('mousemove', e => { cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
 document.querySelectorAll('a,button,.proj-card,.contact-card,.art-circle,.poster-card,.cad-card').forEach(el => {
@@ -560,7 +560,7 @@ document.querySelectorAll('a,button,.proj-card,.contact-card,.art-circle,.poster
   el.addEventListener('mouseleave',()=>cur.classList.remove('hov'));
 });
 
-// Nav
+// nav
 const nav = document.getElementById('nav');
 window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>50),{passive:true});
 
@@ -573,7 +573,7 @@ menuBtn.addEventListener('click', () => {
   mobileMenu.style.display = menuOpen ? 'flex' : 'none';
 });
 
-// Close when a link is clicked
+// close when a link is clicked
 document.querySelectorAll('.mob-link').forEach(link => {
   link.addEventListener('click', () => {
     menuOpen = false;
@@ -581,7 +581,7 @@ document.querySelectorAll('.mob-link').forEach(link => {
   });
 });
 
-// Reveal
+// reveal
 const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}});
 },{threshold:0.1});
@@ -598,7 +598,7 @@ function switchTab(tab) {
 const mq = document.getElementById('mq');
 mq.innerHTML += mq.innerHTML;
 
-// ── Astronaut
+// ── Astronaut (0_0)
 (function(){
   const canvas = document.getElementById('astCanvas');
   const W = 340, H = 440;
@@ -616,7 +616,7 @@ mq.innerHTML += mq.innerHTML;
   const cam = new T.PerspectiveCamera(36, W / H, 0.1, 100);
   cam.position.set(0, 0.2, 6);
 
-  // Blue-tinted lighting setup
+  // Blue-ish lighting setup
   scene.add(new T.AmbientLight(0x0a2a4a, 1.0));
   const key = new T.DirectionalLight(0x88ddff, 3.0); key.position.set(3, 5, 5); scene.add(key);
   const fill = new T.DirectionalLight(0x1155aa, 0.5); fill.position.set(-4, 2, 2); scene.add(fill);
@@ -624,7 +624,7 @@ mq.innerHTML += mq.innerHTML;
   const front = new T.PointLight(0x44ccff, 2.0, 14); front.position.set(0, 1, 4); scene.add(front);
   const under = new T.PointLight(0x0044aa, 1.2, 8); under.position.set(0, -3, 2); scene.add(under);
 
-  // All blue/cyan materials
+  // All blue/cyan parts
   const suitMat = new T.MeshStandardMaterial({ color: 0x5bbcee, metalness: 0.25, roughness: 0.5 });
   const suitDarkMat = new T.MeshStandardMaterial({ color: 0x1a4a88, metalness: 0.55, roughness: 0.3 });
   const accentMat = new T.MeshStandardMaterial({ color: 0x22aaee, metalness: 0.8, roughness: 0.15, emissive: 0x0066bb, emissiveIntensity: 0.6 });
@@ -703,7 +703,7 @@ mq.innerHTML += mq.innerHTML;
   // Chest panel
   const panel = new T.Mesh(new T.BoxGeometry(0.52, 0.38, 0.12), suitDarkMat);
   panel.position.set(0, -1.46, 0.62); g.add(panel);
-  // Panel lights — blue/cyan tones to match vibe
+  // Panel lights (blue-ish tones)
   [[-0.14, -1.58, 0.69, 0x00eeff], [0, -1.58, 0.69, 0x4488ff], [0.14, -1.58, 0.69, 0x0099ff]].forEach(([x, y, z, col]) => {
     const dot = new T.Mesh(new T.SphereGeometry(0.038, 12, 12),
       new T.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 2.5 }));
@@ -734,14 +734,14 @@ mq.innerHTML += mq.innerHTML;
     scrollRY += delta * 0.001;
   }, { passive: true });
 
-  // Also listen on the parent via postMessage if embedded
+  //listen on the parent via postMessage if embedded
   window.addEventListener('message', (e) => {
     if (e.data && typeof e.data.scrollDelta === 'number') {
       scrollRY += e.data.scrollDelta * 0.012;
     }
   });
 
-  // Wheel fallback — works great inside the widget itself
+  //Wheel fallback
   window.addEventListener('wheel', (e) => {
     scrollRY += e.deltaY * 0.002;
   }, { passive: true });
@@ -753,7 +753,7 @@ mq.innerHTML += mq.innerHTML;
     requestAnimationFrame(loop);
     t += 0.009;
 
-    // Float
+    //Float (astronaut)
     g.position.y = 0.2 + Math.sin(t) * 0.09;
     g.rotation.x = Math.sin(t * 0.7) * 0.016;
 
@@ -772,7 +772,7 @@ mq.innerHTML += mq.innerHTML;
 
 /////////////////////////////////////////
 
-//Project Click
+//Proj click
 const PROJECTS = [
   {
     num: '01 / 04', eye: 'PCB Design · Electronics',
@@ -829,7 +829,7 @@ const PROJECTS = [
   },
 ];
 
-// Overlay HTML
+// Overlay HTML (second pg)
 const overlayHTML = `
 <div id="projOverlay" style="
   position:fixed;inset:0;z-index:500;
@@ -864,7 +864,7 @@ document.body.insertAdjacentHTML('beforeend', overlayHTML);
 const overlay = document.getElementById('projOverlay');
 const projBack = document.getElementById('projBack');
 
-// Click the whole card to open
+// click the whole thing to open
 document.querySelectorAll('.proj-card').forEach(card => {
   card.style.cursor = 'pointer';
   card.addEventListener('click', () => {
@@ -893,13 +893,13 @@ document.querySelectorAll('.proj-card').forEach(card => {
   });
 });
 
-// Back button
+//back button
 projBack.addEventListener('click', () => {
   overlay.style.transform = 'translateX(100%)';
   document.body.style.overflow = '';
 });
 
-// ESC key to close
+// ESC key to close (back button also works)
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     overlay.style.transform = 'translateX(100%)';
@@ -917,6 +917,7 @@ document.addEventListener('keydown', e => {
   const ctx = canvas.getContext('2d');
   let W, H, pts, all;
 
+  //each star
   const raw=[
     {id:'TR',nx:.77,ny:.34,r:5.0},{id:'A',nx:.70,ny:.41,r:3.8},
     {id:'B',nx:.64,ny:.47,r:4.8},{id:'C',nx:.69,ny:.51,r:3.4},
@@ -945,7 +946,7 @@ document.addEventListener('keydown', e => {
     raw.forEach(p=>{ pts[p.id]={...p, x:p.nx*FW + offsetX, y:p.ny*FH}; });
     all = Object.values(pts);
 
-    // Lower opacity on mobile
+    // lower opacity on phone (cuz constellation behind the txt)
     canvas.style.opacity = W < 768 ? '0.15' : '1';
   }
 
@@ -1088,7 +1089,7 @@ document.addEventListener('keydown', e => {
     })();
   }
 
-  // Init when CAD tab becomes visible
+  // init when CAD tab becomes visible
   let cadInited=false;
   const origSwitch=window.switchTab;
   window.switchTab=function(tab){
