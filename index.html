@@ -166,6 +166,21 @@ section{padding:108px 52px;border-top:1px solid var(--line);position:relative;z-
 .cad-badge{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border:1px solid rgba(61,155,255,.25);color:var(--accent);background:rgba(61,155,255,.05);margin-top:10px}
 .cad-hint{font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:.04em;opacity:.7}
 
+/* TOUCHDESIGNER */
+.td-intro{margin-bottom:36px}
+.td-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.td-blurb{color:var(--muted);font-size:13px;line-height:1.85;max-width:560px}
+.td-grid{display:flex;gap:24px;flex-wrap:wrap}
+.td-card{background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;transition:border-color .3s,box-shadow .3s;flex:0 0 520px;max-width:100%}
+.td-card:hover{border-color:rgba(61,155,255,.35);box-shadow:0 0 40px rgba(61,155,255,.08)}
+.td-video-wrap{position:relative;height:300px;background:#010a18;overflow:hidden}
+.td-video-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.td-video-overlay{display:none}
+.td-info{padding:20px 24px}
+.td-title{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:var(--ink);margin-bottom:6px}
+.td-desc{font-size:11px;color:var(--muted);line-height:1.7}
+.td-badge{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border:1px solid rgba(61,155,255,.25);color:var(--accent);background:rgba(61,155,255,.05);margin-top:10px}
+
 /* EXPERIENCE */
 .exp-item{display:grid;grid-template-columns:180px 1fr;gap:52px;padding:36px 0;border-bottom:1px solid var(--line)}
 .exp-item:hover .exp-year{color:var(--accent)}
@@ -371,30 +386,43 @@ html {
   <div class="proj-track" id="projTrack">
     <div class="proj-card" data-id="0">
       <span class="proj-num">01</span>
-      <h3 class="proj-title">Custom STM32F405 Development Board</h3>
-      <p class="proj-desc">Custom PCB projects spanning power management, sensor interfacing, and microcontroller breakout boards — from schematic capture to fabrication-ready Gerber files.</p>
-      <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">PCB Layout & Routing</span><span class="proj-tag">Schematic Design</span></div>
+      <h3 class="proj-title">SharkFin v.1.0</h3>
+      <p class="proj-desc">Custom STM32H743-based vision board designed for target-tracking applications. Features an OV5640 camera connector, full peripheral breakout, 5V LiPo input, USB-C, SD card logging, and onboard buzzer — all routed in Altium Designer.</p>
+      <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32H743</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Embedded Vision</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="1">
       <span class="proj-num">02</span>
-      <h3 class="proj-title">NYU ARC Robotics: <br>Team Ultraviolet</h3>
-      <p class="proj-desc">Designing supercapacitor circuits with balance charging and full wiring harnesses for NYU's combat robotics competition team.</p>
-      <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">LTSpice</span><span class="proj-tag">Wiring</span> <span class="proj-tag">Soldering</span></div>
+      <h3 class="proj-title">Drone Flight Controller</h3>
+      <p class="proj-desc">Custom STM32F405-based quadcopter flight controller PCB with 4-motor ESC outputs, USB-C programming, SWD debug interface, and a 5–36V wide-input power system — designed from schematic to Gerber in Altium Designer.</p>
+      <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32F405</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Power Systems</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="2">
       <span class="proj-num">03</span>
+      <h3 class="proj-title">Custom STM32F405 Development Board</h3>
+      <p class="proj-desc">Custom PCB projects spanning power management, sensor interfacing, and microcontroller breakout boards — from schematic capture to fabrication-ready Gerber files.</p>
+      <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">PCB Layout &amp; Routing</span><span class="proj-tag">Schematic Design</span></div>
+      <span href="#" class="proj-link">View project</span>
+    </div>
+    <div class="proj-card" data-id="3">
+      <span class="proj-num">04</span>
+      <h3 class="proj-title">NYU ARC Robotics: <br>Team Ultraviolet</h3>
+      <p class="proj-desc">Designing supercapacitor circuits with balance charging and full wiring harnesses for NYU’s combat robotics competition team.</p>
+      <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">LTSpice</span><span class="proj-tag">Wiring</span> <span class="proj-tag">Soldering</span></div>
+      <span href="#" class="proj-link">View project</span>
+    </div>
+    <div class="proj-card" data-id="4">
+      <span class="proj-num">05</span>
       <h3 class="proj-title">NYU Rogue Aerospace</h3>
       <p class="proj-desc">Contributing to NYU’s competitive rocketry team by testing avionics firmware and validating flight controller systems for data logging, GPS tracking, and dual-deploy recovery.</p>
       <div class="proj-tags"><span class="proj-tag">Avionics</span><span class="proj-tag">GPS</span><span class="proj-tag">Arduino</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
-    <div class="proj-card"data-id="3">
-      <span class="proj-num">04</span>
+    <div class="proj-card" data-id="5">
+      <span class="proj-num">06</span>
       <h3 class="proj-title">Lower Body Exoskeleton</h3>
-      <p class="proj-desc">Engineered a lower-limb exoskeleton with embedded motor control for ACL rehabilitation and enhance natural mobility.
-        Implemented encoder-based actuation using L298N driver for stable knee and ankle support under variable loads.</p>
+      <p class="proj-desc">Engineered a lower-limb exoskeleton with embedded motor control for ACL rehabilitation and enhance natural mobility. Implemented encoder-based actuation using L298N driver for stable knee and ankle support under variable loads.</p>
       <div class="proj-tags"><span class="proj-tag">Fusion 360</span><span class="proj-tag">Arduino</span><span class="proj-tag">C/C++</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
@@ -408,6 +436,7 @@ html {
     <button class="art-tab active" onclick="switchTab('logos')">Logo Design</button>
     <button class="art-tab" onclick="switchTab('posters')">Poster Design</button>
     <button class="art-tab" onclick="switchTab('cad')">CAD Design</button>
+    <button class="art-tab" onclick="switchTab('td')">TouchDesigner</button>
   </div>
 
   <div class="art-panel active" id="panel-logos">
@@ -497,13 +526,41 @@ html {
       </div>
     </div>
   </div>
+
+  <div class="art-panel" id="panel-td">
+    <div class="td-intro reveal">
+      <p class="td-eyebrow">// First experiments</p>
+      <p class="td-blurb">Exploring generative visuals and real-time graphics through TouchDesigner.</p>
+    </div>
+    <div class="td-grid reveal">
+      <div class="td-card">
+        <div class="td-video-wrap">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://drive.google.com/file/d/1MuWwyXFXCVtKZEHIlOvIuMqbYQMqcPHe/preview"
+            title="Particle System"
+            frameborder="0"
+            allow="autoplay"
+            allowfullscreen
+            style="display:block;width:100%;height:100%;">
+          </iframe>
+        </div>
+        <div class="td-info">
+          <h3 class="td-title">Particle System</h3>
+          <p class="td-desc">First experiment with TouchDesigner — a real-time particle simulation driven by noise fields and feedback loops, interactive via mouse input.</p>
+          <span class="td-badge">TouchDesigner · Real-time</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="experience">
   <div class="sec-label">Experience</div>
   <div class="exp-item reveal" style="transition-delay:.1s">
     <p class="exp-year">Aug 2025 — Now</p>
-    <div><h3 class="exp-role">Undergraduate Teaching Assistant</h3><p class="exp-co">NYU General Engineering Department | Brooklyn, NY</p><p class="exp-desc">Led technical labs in CAD, coding, circuitry, and prototyping while mentoring student teams and supporting CAD troubleshooting, soldering instruction, and 3D printing workflows.</p></div>
+    <div><h3 class="exp-role">Undergraduate Teaching Assistant / Prototyping Head</h3><p class="exp-co">NYU General Engineering Department | Brooklyn, NY</p><p class="exp-desc">Led technical labs in CAD, coding, circuitry, and prototyping while mentoring student teams and supporting CAD troubleshooting, soldering instruction, and 3D printing workflows.</p></div>
   </div>
   <div class="exp-item reveal" style="transition-delay:.2s">
     <p class="exp-year">Jun 2023 — Jul 2023</p>
@@ -564,7 +621,7 @@ html {
 // Cursor
 const cur = document.getElementById('cur');
 document.addEventListener('mousemove', e => { cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
-document.querySelectorAll('a,button,.proj-card,.contact-card,.art-circle,.poster-card,.cad-card').forEach(el => {
+document.querySelectorAll('a,button,.proj-card,.contact-card,.art-circle,.poster-card,.cad-card,.td-card').forEach(el => {
   el.addEventListener('mouseenter',()=>cur.classList.add('hov'));
   el.addEventListener('mouseleave',()=>cur.classList.remove('hov'));
 });
@@ -598,7 +655,7 @@ document.querySelectorAll('.reveal,.reveal-r').forEach(el=>io.observe(el));
 
 // Tabs
 function switchTab(tab) {
-  const tabs = ['logos','posters','cad'];
+  const tabs = ['logos','posters','cad','td'];
   document.querySelectorAll('.art-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
   tabs.forEach(id=>document.getElementById('panel-'+id).classList.toggle('active',id===tab));
 }
@@ -784,7 +841,39 @@ mq.innerHTML += mq.innerHTML;
 //Project Click
 const PROJECTS = [
   {
-    num: '01 / 04', eye: 'PCB Design · Electronics',
+    num: '01 / 06', eye: 'PCB Design · Embedded Vision',
+    title: 'SharkFin <em>v.1.0</em>',
+    tags: ['Altium Designer', 'STM32H743', 'OV5640', 'PCB Layout', 'Embedded Vision'],
+    desc: 'A custom vision and tracking board built around the STM32H743VIH6 — a high-performance Cortex-M7 MCU. Features a 6-axis ICM-40609-D IMU for motion sensing, full power muxing between 5V LiPo and USB-C, triple LDO regulation (1.2V, 2.8V, 3.3V) for the camera and MCU rails, SD card logging, buzzer, SWD debug port, and a full peripheral breakout. Designed entirely in Altium Designer.',
+    img: './SharkFin_front.png',
+    imgBack: './SharkFin_back.png',
+    imgSize: '460px',
+    highlights: [
+      { n:'01', t:'<strong>STM32H743VIH6 MCU</strong> — Cortex-M7 running at up to 480MHz with hardware FPU, ideal for real-time DSP and control workloads.' },
+      { n:'02', t:'<strong>ICM-40609-D 6-axis IMU</strong> — gyroscope and accelerometer over SPI for motion sensing and orientation tracking.' },
+      { n:'03', t:'<strong>Power muxing & triple LDO</strong> — automatic switchover between 5V LiPo (JST) and USB-C, with 1.2V, 2.8V, and 3.3V regulation for MCU and camera rails.' },
+      { n:'04', t:'<strong>Full peripheral breakout</strong> — 6× 5V, 6× 3.3V, 6× GND pins plus a 10-pin header (5× PWM, TX, RX, SDA, SCL, GND) for rapid prototyping.' },
+      { n:'05', t:'<strong>Debug & logging</strong> — SWD port, BOOT & RESET buttons, SD card slot, buzzer, and 2 status LEDs for a complete development workflow.' },
+    ]
+  },
+  {
+    num: '02 / 06', eye: 'PCB Design · Drone Systems',
+    title: 'Drone <em>Flight Controller</em>',
+    tags: ['Altium Designer', 'STM32F405', 'PCB Layout & Routing', 'Power Systems'],
+    desc: 'Designed a custom quadcopter flight controller PCB centered on the STM32F405 microcontroller. The board supports 4 brushless motor outputs (PWM ESC), a wide-range 5–36V power input with onboard regulation, USB-C for firmware flashing, SWD debug interface, BOOT and RESET buttons, and an iBUS receiver header — all routed in a compact octagonal form factor optimized for drone mounting.',
+    img: './Drone.png',
+    imgBack: './Drone_back.png',
+    highlights: [
+      { n:'01', t:'<strong>STM32F405 MCU</strong> — high-performance ARM Cortex-M4 core running flight control firmware with hardware FPU for PID computations.' },
+      { n:'02', t:'<strong>4-motor ESC interface</strong> — dedicated PWM output headers (MOTOR 1–4) with individual GND and signal pins for clean ESC wiring.' },
+      { n:'03', t:'<strong>Wide-input power system</strong> — 5–36V input (J10) supports 2S–8S LiPo batteries with onboard regulation for MCU and peripherals.' },
+      { n:'04', t:'<strong>USB-C programming port</strong> — USB-C connector with ESD protection for DFU firmware flashing and serial communication.' },
+      { n:'05', t:'<strong>SWD debug interface</strong> — exposed SWD header alongside BOOT and RESET buttons for full firmware development workflow.' },
+      { n:'06', t:'<strong>iBUS receiver header</strong> — dedicated iBUS RX connector (J9) for direct RC receiver integration and channel parsing.' },
+    ]
+  },
+  {
+    num: '03 / 06', eye: 'PCB Design · Electronics',
     title: 'Custom <em>PCB Design</em>',
     tags: ['Altium Designer', 'PCB Layout & Routing', 'Schematic Design'],
     desc: 'Designed a 2-layer STM32F405 development board in Altium Designer with breakout headers for SPI, I²C, UART, and ADC peripherals. Implemented a 24V→5V buck and 3.3V LDO power system for reliable MCU power delivery and integrated USB-C with ESD protection and differential pair routing, along with SWD debugging support.',
@@ -792,18 +881,14 @@ const PROJECTS = [
     imgBack: './pcb_back.png',
     highlights: [
       { n:'01', t:'<strong>Power architecture</strong> — 24V→5V buck converter and 3.3V LDO designed for stable MCU and peripheral power delivery.' },
-
       { n:'02', t:'<strong>USB interface design</strong> — USB-C routing with ESD protection and controlled differential pair impedance.' },
-
       { n:'03', t:'<strong>Peripheral breakout</strong> — SPI, I²C, UART, and ADC interfaces exposed through headers for rapid prototyping.' },
-
       { n:'04', t:'<strong>Debugging interface</strong> — SWD programming, reset circuitry, and boot configuration for firmware development.' },
-
       { n:'05', t:'<strong>Signal integrity</strong> — decoupling strategy, ground planes, and differential routing to reduce noise and improve stability.' },
     ]
   },
   {
-    num: '02 / 04', eye: 'Robotics · Electronics',
+    num: '04 / 06', eye: 'Robotics · Electronics',
     title: 'NYU ARC Robotics: <em>Team Ultraviolet</em>',
     link: 'https://nyu-arc-robotics.com',
     linkLabel: 'nyu-arc-robotics.com',
@@ -815,7 +900,7 @@ const PROJECTS = [
     ]
   },
   {
-    num: '03 / 04', eye: 'Aerospace · Avionics',
+    num: '05 / 06', eye: 'Aerospace · Avionics',
     title: 'NYU Rogue <em>Aerospace</em>',
     link: 'https://www.nyurogueaerospace.com',
     linkLabel: 'nyurogueaerospace.com',
@@ -826,7 +911,7 @@ const PROJECTS = [
     ]
   },
   {
-    num: '04 / 04', eye: 'Embedded Systems · Mechanical Design',
+    num: '06 / 06', eye: 'Embedded Systems · Mechanical Design',
     title: 'Lower Body <em>Exoskeleton</em>',
     tags: ['Fusion 360', 'Arduino', 'C/C++'],
     desc: 'Engineered a lower-limb exoskeleton with embedded motor control for ACL rehabilitation. Implemented encoder-based actuation using L298N driver for stable knee and ankle support under variable loads.',
@@ -886,9 +971,11 @@ document.querySelectorAll('.proj-card').forEach(card => {
     //pcb images
     const imgEl = document.getElementById('projImg');
     imgEl.src = p.img || '';
+    imgEl.style.width = p.imgSize || '320px';
     imgEl.style.display = p.img ? 'block' : 'none';
     const imgBackEl = document.getElementById('projImgBack');
     imgBackEl.src = p.imgBack || '';
+    imgBackEl.style.width = p.imgSize || '320px';
     imgBackEl.style.display = p.imgBack ? 'block' : 'none';
     document.getElementById('projTags').innerHTML    = p.tags.map(t => `<span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(61,155,255,.2);color:#3d9bff">${t}</span>`).join('') + (p.link ? `<a href="${p.link}" target="_blank" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(255,255,255,.2);color:#ffffff;text-decoration:none;transition:background .2s" onmouseenter="this.style.background='rgba(255,255,255,.08)'" onmouseleave="this.style.background='none'">🔗 ${p.linkLabel}</a>` : '');
     document.getElementById('projHL').innerHTML      = p.highlights.map(h =>
