@@ -110,12 +110,12 @@ section{padding:108px 52px;border-top:1px solid var(--line);position:relative;z-
 .proj-card:hover{transform:translateY(-8px);border-color:rgba(61,155,255,.3)}
 .proj-card:hover::before{transform:scaleX(1)}
 .proj-card:hover::after{opacity:1}
-.proj-num{font-family:'Fraunces',serif;font-size:72px;font-weight:200;color:rgba(61,155,255,.05);line-height:1;margin-bottom:-14px;display:block}
-.proj-title{font-family:'Fraunces',serif;font-size:24px;font-weight:300;letter-spacing:-.01em;color:var(--ink);margin-bottom:14px}
-.proj-desc{color:var(--muted);font-size:12px;line-height:1.85;margin-bottom:26px}
-.proj-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px}
+.proj-num{font-family:'Fraunces',serif;font-size:72px;font-weight:200;color:rgba(61,155,255,.05);line-height:1;margin-bottom:-14px;display:block;position:relative;z-index:1}
+.proj-title{font-family:'Fraunces',serif;font-size:24px;font-weight:300;letter-spacing:-.01em;color:var(--ink);margin-bottom:14px;position:relative;z-index:1}
+.proj-desc{color:var(--muted);font-size:12px;line-height:1.85;margin-bottom:26px;position:relative;z-index:1}
+.proj-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;position:relative;z-index:1}
 .proj-tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border:1px solid rgba(61,155,255,.2);color:var(--accent);background:rgba(61,155,255,.05)}
-.proj-link{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:color .2s,gap .2s}
+.proj-link{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:color .2s,gap .2s;position:relative;z-index:1}
 .proj-link::after{content:'→'}
 .proj-card:hover .proj-link{color:var(--accent2);gap:14px}
 
@@ -274,8 +274,12 @@ body {
 html {
   overflow-x: hidden;
 }
-.proj-pcb-img{width:90%;height:140px;object-fit:contain;object-position:center;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto;filter:drop-shadow(0 0 0px rgba(61,155,255,0)) brightness(0.75);transition:filter .5s ease,transform .5s ease;transform:scale(1) translateY(0)}
-.proj-card:hover .proj-pcb-img{filter:drop-shadow(0 0 18px rgba(61,155,255,.7)) drop-shadow(0 0 40px rgba(61,155,255,.3)) brightness(1.1);transform:scale(1.06) translateY(-4px)}
+.proj-pcb-img{position:absolute;right:-10%;top:50%;transform:translateY(-50%);width:75%;height:auto;object-fit:contain;object-position:right center;opacity:0.1;transition:opacity .4s ease;z-index:0;pointer-events:none}
+.proj-card:hover .proj-pcb-img{opacity:0.18;transform:translateY(-50%)}
+.proj-pcb-sharkfin{width:95%;right:-20%}
+.proj-card:hover .proj-pcb-sharkfin{opacity:0.18;transform:translateY(-50%)}
+.proj-pcb-drone{width:110%;right:-25%;top:50%}
+.proj-card:hover .proj-pcb-drone{opacity:0.18;transform:translateY(-50%)}
 
 .proj-tag--link {
   color: #4fc3f7;
@@ -388,27 +392,27 @@ html {
   </div>
   <div class="proj-track" id="projTrack">
     <div class="proj-card" data-id="0">
+      <img src="SharkFin_front.png" alt="SharkFin v1.0 PCB" class="proj-pcb-img proj-pcb-sharkfin"/>
       <span class="proj-num">01</span>
       <h3 class="proj-title">SharkFin v.1.0</h3>
       <p class="proj-desc">Custom STM32H743-based vision board designed for target-tracking applications. Features an OV5640 camera connector, full peripheral breakout, 5V LiPo input, USB-C, SD card logging, and onboard buzzer — all routed in Altium Designer.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32H743</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Embedded Vision</span></div>
-      <img src="SharkFin_front.png" alt="SharkFin v1.0 PCB" class="proj-pcb-img"/>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="1">
+      <img src="Drone.png" alt="Drone Flight Controller PCB" class="proj-pcb-img proj-pcb-drone"/>
       <span class="proj-num">02</span>
       <h3 class="proj-title">Drone Flight Controller</h3>
       <p class="proj-desc">Custom STM32F405-based quadcopter flight controller PCB with 4-motor ESC outputs, USB-C programming, SWD debug interface, and a 5–36V wide-input power system — designed from schematic to Gerber in Altium Designer.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32F405</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Power Systems</span></div>
-      <img src="Drone.png" alt="Drone Flight Controller PCB" class="proj-pcb-img"/>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="2">
+      <img src="pcb.png" alt="STM32F405 Development Board PCB" class="proj-pcb-img"/>
       <span class="proj-num">03</span>
       <h3 class="proj-title">Custom STM32F405 Development Board</h3>
       <p class="proj-desc">Custom PCB projects spanning power management, sensor interfacing, and microcontroller breakout boards — from schematic capture to fabrication-ready Gerber files.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">PCB Layout &amp; Routing</span><span class="proj-tag">Schematic Design</span></div>
-      <img src="pcb.png" alt="STM32F405 Development Board PCB" class="proj-pcb-img"/>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="3">
