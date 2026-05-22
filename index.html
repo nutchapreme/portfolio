@@ -274,6 +274,9 @@ body {
 html {
   overflow-x: hidden;
 }
+.proj-pcb-img{width:90%;height:140px;object-fit:contain;object-position:center;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto;filter:drop-shadow(0 0 0px rgba(61,155,255,0)) brightness(0.75);transition:filter .5s ease,transform .5s ease;transform:scale(1) translateY(0)}
+.proj-card:hover .proj-pcb-img{filter:drop-shadow(0 0 18px rgba(61,155,255,.7)) drop-shadow(0 0 40px rgba(61,155,255,.3)) brightness(1.1);transform:scale(1.06) translateY(-4px)}
+
 .proj-tag--link {
   color: #4fc3f7;
   border-color: #4fc3f7;
@@ -389,6 +392,7 @@ html {
       <h3 class="proj-title">SharkFin v.1.0</h3>
       <p class="proj-desc">Custom STM32H743-based vision board designed for target-tracking applications. Features an OV5640 camera connector, full peripheral breakout, 5V LiPo input, USB-C, SD card logging, and onboard buzzer — all routed in Altium Designer.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32H743</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Embedded Vision</span></div>
+      <img src="SharkFin_front.png" alt="SharkFin v1.0 PCB" class="proj-pcb-img"/>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="1">
@@ -396,6 +400,7 @@ html {
       <h3 class="proj-title">Drone Flight Controller</h3>
       <p class="proj-desc">Custom STM32F405-based quadcopter flight controller PCB with 4-motor ESC outputs, USB-C programming, SWD debug interface, and a 5–36V wide-input power system — designed from schematic to Gerber in Altium Designer.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32F405</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Power Systems</span></div>
+      <img src="Drone.png" alt="Drone Flight Controller PCB" class="proj-pcb-img"/>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="2">
@@ -403,6 +408,7 @@ html {
       <h3 class="proj-title">Custom STM32F405 Development Board</h3>
       <p class="proj-desc">Custom PCB projects spanning power management, sensor interfacing, and microcontroller breakout boards — from schematic capture to fabrication-ready Gerber files.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">PCB Layout &amp; Routing</span><span class="proj-tag">Schematic Design</span></div>
+      <img src="pcb.png" alt="STM32F405 Development Board PCB" class="proj-pcb-img"/>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="3">
@@ -538,10 +544,10 @@ html {
           <iframe
             width="100%"
             height="100%"
-            src="https://drive.google.com/file/d/1MuWwyXFXCVtKZEHIlOvIuMqbYQMqcPHe/preview"
+            src="https://www.youtube.com/embed/zLvL5eJ2T9Y?autoplay=1&mute=1&loop=1&playlist=zLvL5eJ2T9Y&controls=0&modestbranding=1&rel=0"
             title="Particle System"
             frameborder="0"
-            allow="autoplay"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
             style="display:block;width:100%;height:100%;">
           </iframe>
