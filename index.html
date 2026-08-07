@@ -296,6 +296,9 @@ html {
 .proj-pcb-sharkfin{width:95%;right:-20%}
 .proj-card:hover .proj-pcb-sharkfin{opacity:0.18;transform:translateY(-50%)}
 .proj-pcb-drone{width:82%;right:-10%;top:50%}
+.proj-pcb-arc{width:78%;right:-8%}
+.proj-pcb-rogue{width:62%;right:-4%}
+.proj-card:hover .proj-pcb-arc,.proj-card:hover .proj-pcb-rogue{opacity:0.18;transform:translateY(-50%)}
 .proj-card:hover .proj-pcb-drone{opacity:0.18;transform:translateY(-50%)}
 
 .proj-tag--link {
@@ -433,6 +436,7 @@ html {
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="3">
+      <img src="arc_logo.png" alt="NYU ARC Robotics Team Ultraviolet" class="proj-pcb-img proj-pcb-arc"/>
       <span class="proj-num">04</span>
       <h3 class="proj-title">NYU ARC Robotics: <br>Team Ultraviolet</h3>
       <p class="proj-desc">Designing supercapacitor circuits with balance charging and full wiring harnesses for NYU’s combat robotics competition team.</p>
@@ -440,10 +444,11 @@ html {
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="4">
+      <img src="rogue_logo.png" alt="NYU Rogue Aerospace" class="proj-pcb-img proj-pcb-rogue"/>
       <span class="proj-num">05</span>
       <h3 class="proj-title">NYU Rogue Aerospace</h3>
-      <p class="proj-desc">Contributing to NYU’s competitive rocketry team by testing avionics firmware and validating flight controller systems for data logging, GPS tracking, and dual-deploy recovery.</p>
-      <div class="proj-tags"><span class="proj-tag">Avionics</span><span class="proj-tag">GPS</span><span class="proj-tag">Arduino</span></div>
+      <p class="proj-desc">Designing the water-ejection payload for NYU’s rocketry team end to end — apogee detection, valve and motor actuation, embedded firmware, and a custom PCB taken from perfboard prototype to fabricated board.</p>
+      <div class="proj-tags"><span class="proj-tag">Payload Systems</span><span class="proj-tag">Altium Designer</span><span class="proj-tag">Embedded C</span><span class="proj-tag">Avionics</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="5">
@@ -935,10 +940,17 @@ const PROJECTS = [
     title: 'NYU Rogue <em>Aerospace</em>',
     link: 'https://www.nyurogueaerospace.com',
     linkLabel: 'nyurogueaerospace.com',
-    tags: ['Avionics', 'GPS', 'Arduino'],
-    desc: 'Worked on avionics and communication systems for NYU’s rocket team, contributing to the design and integration of GPS tracking and RF telemetry for flight data transmission. Assisted in developing electronics and wiring systems to support reliable data acquisition and communication between the rocket and ground station during flight tests.',
+    tags: ['Payload Systems', 'Altium Designer', 'Embedded C', 'Avionics', 'GPS'],
+    gallery: ['./rogue_team.jpg', './rogue1.jpg', './rogue2.jpg'],
+    desc: 'Designed the water-ejection payload for NYU’s competitive rocketry team end to end — system architecture, circuit design, embedded firmware, and the board itself. The payload detects apogee barometrically, opens a servo valve, then drives a motor to push water out of the tank. Took it from breadboard concept through a soldered perfboard build to a custom PCB, consolidating what had been an Arduino Nano, motor driver, and EasyMini altimeter into one LiPo-powered board. Also work on avionics and communications — GPS tracking and RF telemetry between the rocket and ground station — and spray-painted the competition airframe.',
     highlights: [
-      { n:'01', t:'<strong>GPS Testing</strong> — Prepare the XBee module to track rockets for competition' }
+      { n:'01', t:'<strong>Full-stack payload design</strong> — carried the water-ejection system from architecture and circuit design through embedded programming, perfboard prototype, and custom PCB — concept to flight hardware.' },
+      { n:'02', t:'<strong>Barometric apogee detection</strong> — MS5611 pressure sensor with firmware that identifies apogee from the altitude curve and fires the deployment sequence autonomously.' },
+      { n:'03', t:'<strong>Two-stage ejection actuation</strong> — servo valve opens the tank, then a motor drives water out, sequenced and timed in firmware.' },
+      { n:'04', t:'<strong>Board consolidation</strong> — replaced a stack of Arduino Nano, motor driver, and EasyMini altimeter with a single LiPo-powered PCB, cutting wiring failure points and payload bay volume.' },
+      { n:'05', t:'<strong>Prototype → product workflow</strong> — validated each subsystem on breadboard, hand-soldered a perfboard revision for flight-condition testing, then committed the proven design to a fabricated PCB.' },
+      { n:'06', t:'<strong>GPS & RF telemetry</strong> — prepared and tested XBee modules for rocket tracking and ground-station data links during competition flights.' },
+      { n:'07', t:'<strong>Airframe finishing</strong> — spray-painted the competition rocket’s exterior.' },
     ]
   },
   {
@@ -975,6 +987,25 @@ const overlayHTML = `
   #projOverlay .proj-body-pad {
     padding: 64px 52px;
   }
+  #projOverlay .proj-gallery {
+    display: grid;
+    grid-template-columns: 1fr 0.6fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    flex-shrink: 0;
+    width: 560px;
+  }
+  #projOverlay .proj-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border: 1px solid rgba(61,155,255,.15);
+  }
+  #projOverlay .proj-gallery img:nth-child(3) {
+    grid-column: 2;
+    grid-row: 1 / span 2;   /* tall shot fills the right, aligned to both stacked shots */
+  }
   #projOverlay .proj-nav-bar {
     padding: 20px 52px;
   }
@@ -998,6 +1029,11 @@ const overlayHTML = `
       order: 0;
       max-width: 100% !important;
     }
+    #projOverlay .proj-gallery {
+      order: -1;
+      width: 100%;
+      max-width: 460px;
+    }
   }
   @media (max-width: 600px) {
     #projOverlay .proj-images-wrap {
@@ -1007,6 +1043,11 @@ const overlayHTML = `
     #projOverlay .proj-images-wrap img {
       width: 100% !important;
       max-width: 420px;
+    }
+    #projOverlay .proj-gallery {
+      max-width: 320px;
+      gap: 6px;
+      margin: 0 auto;
     }
     #projOverlay .proj-body-pad {
       padding: 36px 20px;
@@ -1038,6 +1079,7 @@ const overlayHTML = `
         <img id="projImg" style="width:320px;display:none"/>
         <img id="projImgBack" style="width:320px;display:none"/>
       </div>
+      <div class="proj-gallery" id="projGallery" style="display:none"></div>
     </div>
     <p style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#3d9bff;margin-bottom:12px">Key highlights</p>
     <div id="projHL" style="display:flex;flex-direction:column;gap:2px"></div>
@@ -1068,6 +1110,18 @@ document.querySelectorAll('.proj-card').forEach(card => {
     imgBackEl.src = p.imgBack || '';
     imgBackEl.style.width = p.imgSize || '320px';
     imgBackEl.style.display = p.imgBack ? 'block' : 'none';
+
+    // photo gallery (used by projects with no PCB render)
+    const galEl = document.getElementById('projGallery');
+    if (p.gallery && p.gallery.length) {
+      galEl.innerHTML = p.gallery.map(src => `<img src="${src}" alt="${p.eye}" loading="lazy"/>`).join('');
+      galEl.style.display = 'grid';
+      document.querySelector('#projOverlay .proj-images-wrap').style.display = 'none';
+    } else {
+      galEl.innerHTML = '';
+      galEl.style.display = 'none';
+      document.querySelector('#projOverlay .proj-images-wrap').style.display = 'flex';
+    }
     document.getElementById('projTags').innerHTML    = p.tags.map(t => `<span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(61,155,255,.2);color:#3d9bff">${t}</span>`).join('') + (p.link ? `<a href="${p.link}" target="_blank" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(255,255,255,.2);color:#ffffff;text-decoration:none;transition:background .2s" onmouseenter="this.style.background='rgba(255,255,255,.08)'" onmouseleave="this.style.background='none'">🔗 ${p.linkLabel}</a>` : '');
     document.getElementById('projHL').innerHTML      = p.highlights.map(h =>
       `<div style="display:flex;gap:14px;padding:16px 20px;background:#071525;border:1px solid rgba(61,155,255,.1)">
