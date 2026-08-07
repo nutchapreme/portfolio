@@ -159,7 +159,7 @@ section{padding:108px 52px;border-top:1px solid var(--line);position:relative;z-
 .cad-card{background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;transition:border-color .3s,box-shadow .3s;flex:0 0 420px;min-width:0}
 .cad-card:hover{border-color:rgba(61,155,255,.35);box-shadow:0 0 40px rgba(61,155,255,.08)}
 .cad-canvas-wrap{position:relative;height:260px;background:linear-gradient(135deg,#040e1e,#071a30)}
-.cad-canvas-wrap canvas{display:block;width:100%!important;height:100%!important}
+.cad-canvas-wrap canvas{display:block;width:100%!important;height:100%!important;touch-action:none}
 .cad-info{padding:20px 24px}
 .cad-title{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:var(--ink);margin-bottom:6px}
 .cad-desc{font-size:11px;color:var(--muted);line-height:1.7}
@@ -234,8 +234,25 @@ footer p{font-size:11px;letter-spacing:.06em;color:var(--muted)}
   .about-grid,.exp-item{grid-template-columns:1fr;gap:24px}
   .art-grid{gap:32px}.art-circle{width:180px;height:180px}
   footer{flex-direction:column;gap:10px;text-align:center}
-  .proj-header{padding-right:24px}.proj-card{width:300px}
+  .proj-header{padding-right:24px}
   .poster-card{width:220px}
+
+  /* faster ticker on mobile */
+  .marquee-track{animation-duration:9s}
+
+  /* wider + shorter project cards, same font sizes */
+  .proj-card{width:88vw;max-width:430px;padding:26px 22px}
+  .proj-num{font-size:52px;margin-bottom:-8px}
+  .proj-title{font-size:23px;margin-bottom:10px}
+  .proj-desc{line-height:1.6;margin-bottom:18px}
+  .proj-tags{margin-bottom:20px;gap:5px}
+  .proj-card:hover{transform:none}
+}
+
+/* no custom cursor on touch devices */
+@media(hover:none),(pointer:coarse){
+  body{cursor:auto}
+  #cur{display:none!important}
 }
 
 /* overlay */
@@ -278,7 +295,7 @@ html {
 .proj-card:hover .proj-pcb-img{opacity:0.18;transform:translateY(-50%)}
 .proj-pcb-sharkfin{width:95%;right:-20%}
 .proj-card:hover .proj-pcb-sharkfin{opacity:0.18;transform:translateY(-50%)}
-.proj-pcb-drone{width:110%;right:-25%;top:50%}
+.proj-pcb-drone{width:82%;right:-10%;top:50%}
 .proj-card:hover .proj-pcb-drone{opacity:0.18;transform:translateY(-50%)}
 
 .proj-tag--link {
@@ -395,7 +412,7 @@ html {
       <img src="SharkFin_front.png" alt="SharkFin v1.0 PCB" class="proj-pcb-img proj-pcb-sharkfin"/>
       <span class="proj-num">01</span>
       <h3 class="proj-title">SharkFin v.1.0</h3>
-      <p class="proj-desc">Custom STM32H743-based vision board designed for target-tracking applications. Features an OV5640 camera connector, full peripheral breakout, 5V LiPo input, USB-C, SD card logging, and onboard buzzer — all routed in Altium Designer.</p>
+      <p class="proj-desc">Custom STM32H743-based vision board for target-tracking robots. Features OV5640 camera, peripheral breakout, USB-C, SD card logging, and onboard buzzer.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32H743</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Embedded Vision</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
@@ -403,7 +420,7 @@ html {
       <img src="Drone.png" alt="Drone Flight Controller PCB" class="proj-pcb-img proj-pcb-drone"/>
       <span class="proj-num">02</span>
       <h3 class="proj-title">Drone Flight Controller</h3>
-      <p class="proj-desc">Custom STM32F405-based quadcopter flight controller PCB with 4-motor ESC outputs, USB-C programming, SWD debug interface, and a 5–36V wide-input power system — designed from schematic to Gerber in Altium Designer.</p>
+      <p class="proj-desc">Custom STM32F405-based quadcopter flight controller PCB with 4-motor ESC outputs, USB-C programming, SWD debug interface, and a 5–36V wide-input power system.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32F405</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Power Systems</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
@@ -432,7 +449,7 @@ html {
     <div class="proj-card" data-id="5">
       <span class="proj-num">06</span>
       <h3 class="proj-title">Lower Body Exoskeleton</h3>
-      <p class="proj-desc">Engineered a lower-limb exoskeleton with embedded motor control for ACL rehabilitation and enhance natural mobility. Implemented encoder-based actuation using L298N driver for stable knee and ankle support under variable loads.</p>
+      <p class="proj-desc">Lower-limb exoskeleton for ACL rehabilitation with encoder-based PID control via L298N motor driver, achieving less than 5° joint overshoot.</p>
       <div class="proj-tags"><span class="proj-tag">Fusion 360</span><span class="proj-tag">Arduino</span><span class="proj-tag">C/C++</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
@@ -627,13 +644,18 @@ html {
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// Cursor
+// Cursor (desktop only)
 const cur = document.getElementById('cur');
-document.addEventListener('mousemove', e => { cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
-document.querySelectorAll('a,button,.proj-card,.contact-card,.art-circle,.poster-card,.cad-card,.td-card').forEach(el => {
-  el.addEventListener('mouseenter',()=>cur.classList.add('hov'));
-  el.addEventListener('mouseleave',()=>cur.classList.remove('hov'));
-});
+const isTouch = window.matchMedia('(hover:none),(pointer:coarse)').matches;
+if (isTouch) {
+  if (cur) cur.remove();
+} else {
+  document.addEventListener('mousemove', e => { cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
+  document.querySelectorAll('a,button,.proj-card,.contact-card,.art-circle,.poster-card,.cad-card,.td-card').forEach(el => {
+    el.addEventListener('mouseenter',()=>cur.classList.add('hov'));
+    el.addEventListener('mouseleave',()=>cur.classList.remove('hov'));
+  });
+}
 
 // Nav
 const nav = document.getElementById('nav');
@@ -1202,7 +1224,7 @@ document.addEventListener('keydown', e => {
     return geo;
   }
 
-  function cadViewer(canvasId) {
+  function cadViewer(canvasId, preRotX) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const wrap = canvas.parentElement;
@@ -1219,6 +1241,7 @@ document.addEventListener('keydown', e => {
 
     const buf = b64ToBuffer(STL_DATA[canvasId]);
     const geo = parseSTL(buf);
+    if (preRotX) geo.rotateX(preRotX);   // bake starting orientation
     geo.computeBoundingBox();
     const box = geo.boundingBox;
     const cx=(box.max.x+box.min.x)/2, cy=(box.max.y+box.min.y)/2, cz=(box.max.z+box.min.z)/2;
@@ -1237,11 +1260,42 @@ document.addEventListener('keydown', e => {
       mx=e.clientX; my=e.clientY;
     });
     canvas.addEventListener('wheel',e=>{zoom+=e.deltaY*sz*0.001;zoom=Math.max(sz*0.4,Math.min(sz*5,zoom));e.preventDefault();},{passive:false});
-    canvas.addEventListener('touchstart',e=>{mx=e.touches[0].clientX;my=e.touches[0].clientY;},{passive:true});
+    let pinchD = 0;
+    const tDist = t => Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+
+    canvas.addEventListener('touchstart',e=>{
+      isDown = true;
+      if(e.touches.length === 2){
+        pinchD = tDist(e.touches);
+      } else {
+        mx=e.touches[0].clientX; my=e.touches[0].clientY;
+      }
+    },{passive:true});
+
     canvas.addEventListener('touchmove',e=>{
-      rotY+=(e.touches[0].clientX-mx)*0.4; rotX+=(e.touches[0].clientY-my)*0.4;
-      mx=e.touches[0].clientX; my=e.touches[0].clientY; e.preventDefault();
+      if(e.touches.length === 2){
+        const d = tDist(e.touches);
+        if(pinchD > 0 && d > 0){
+          zoom *= pinchD / d;                                  // spread = zoom in
+          zoom = Math.max(sz*0.4, Math.min(sz*5, zoom));
+        }
+        pinchD = d;
+      } else {
+        rotY+=(e.touches[0].clientX-mx)*0.4; rotX+=(e.touches[0].clientY-my)*0.4;
+        rotX=Math.max(-88,Math.min(88,rotX));
+        mx=e.touches[0].clientX; my=e.touches[0].clientY;
+      }
+      e.preventDefault();
     },{passive:false});
+
+    canvas.addEventListener('touchend',e=>{
+      pinchD = 0;
+      if(e.touches.length === 1){                              // one finger lifted, keep rotating
+        mx=e.touches[0].clientX; my=e.touches[0].clientY;
+      } else if(e.touches.length === 0){
+        isDown = false;
+      }
+    },{passive:true});
 
     let autoR=0;
     (function loop(){
@@ -1261,7 +1315,11 @@ document.addEventListener('keydown', e => {
     origSwitch(tab);
     if(tab==='cad'&&!cadInited){
       cadInited=true;
-      setTimeout(()=>{cadViewer('cadCanvas1');cadViewer('cadCanvas2');cadViewer('cadCanvas3');},50);
+      setTimeout(()=>{
+        cadViewer('cadCanvas1', -Math.PI/2);  // engine: start on the cylinder/crank side
+        cadViewer('cadCanvas2');
+        cadViewer('cadCanvas3');
+      },50);
     }
   };
 })();
