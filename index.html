@@ -439,8 +439,8 @@ html {
       <img src="arc_logo.png" alt="NYU ARC Robotics Team Ultraviolet" class="proj-pcb-img proj-pcb-arc"/>
       <span class="proj-num">04</span>
       <h3 class="proj-title">NYU ARC Robotics: <br>Team Ultraviolet</h3>
-      <p class="proj-desc">Designing supercapacitor circuits with balance charging and full wiring harnesses for NYU’s combat robotics competition team.</p>
-      <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">LTSpice</span><span class="proj-tag">Wiring</span> <span class="proj-tag">Soldering</span></div>
+      <p class="proj-desc">Supporting electronics for NYU’s combat robotics team — LTspice simulation and bench validation of the supercapacitor power circuit, controller repair, and training new members on robot wiring.</p>
+      <div class="proj-tags"><span class="proj-tag">LTspice</span><span class="proj-tag">Circuit Simulation</span><span class="proj-tag">Soldering</span> <span class="proj-tag">Team Training</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="4">
@@ -928,11 +928,15 @@ const PROJECTS = [
     title: 'NYU ARC Robotics: <em>Team Ultraviolet</em>',
     link: 'https://nyu-arc-robotics.com',
     linkLabel: 'nyu-arc-robotics.com',
-    tags: ['Altium Designer', 'LTSpice', 'Wiring', 'Soldering'],
-    desc: 'Designing supercapacitor balancing circuits for NYU’s combat robotics team; simulated in LTspice and assembled robot wiring harnesses through soldering and integration.',
+    tags: ['LTspice', 'Circuit Simulation', 'Soldering', 'Wiring', 'Team Training'],
+    gallery: ['./arc_main.jpg', './arc1.jpg', './arc2.jpg', './arc3.jpg'],
+    galleryLayout: 'row',
+    desc: 'Support the electronics side of NYU’s combat robotics team. Ran LTspice simulations for the supercapacitor power circuit to validate behavior before the board was built, then bench-tested the assembled capacitor bank on the scope and electronic load. Repair and maintain team controllers and receivers through soldering and rework, and train new members on robot wiring — walking them through how the power and signal paths actually work rather than just handing over a diagram.',
     highlights: [
-      { n:'01', t:'<strong>Supercapacitor circuit & PCB</strong> — designed balancing and power circuitry for robotics energy storage, validated through LTspice simulation.' },
-      { n:'02', t:'<strong>Wiring harness</strong> — soldered connectors and routed wiring for reliable robot power delivery.' },
+      { n:'01', t:'<strong>Supercapacitor circuit simulation</strong> — modeled the balancing and power circuit in LTspice, validating voltage and current behavior before hardware was committed.' },
+      { n:'02', t:'<strong>Bench validation</strong> — tested the assembled capacitor bank with an oscilloscope, DC electronic load, and INA228 current sensing to confirm the design against simulation.' },
+      { n:'03', t:'<strong>Controller repair</strong> — diagnosed and fixed team transmitters and receivers through soldering and rework, keeping the fleet operational through build season.' },
+      { n:'04', t:'<strong>Team training</strong> — taught new members robot wiring and walked them through the circuit architecture so the team can debug power and signal paths independently.' },
     ]
   },
   {
@@ -1006,6 +1010,23 @@ const overlayHTML = `
     grid-column: 2;
     grid-row: 1 / span 2;   /* tall shot fills the right, aligned to both stacked shots */
   }
+  /* row variant — all-vertical shots laid side by side */
+  #projOverlay .proj-gallery.gal-row {
+    display: flex;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    width: auto;
+    max-width: 600px;
+  }
+  #projOverlay .proj-gallery.gal-row img {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 360px;
+  }
+  #projOverlay .proj-gallery.gal-row img:nth-child(3) {
+    grid-column: auto;
+    grid-row: auto;
+  }
   #projOverlay .proj-nav-bar {
     padding: 20px 52px;
   }
@@ -1034,6 +1055,9 @@ const overlayHTML = `
       width: 100%;
       max-width: 460px;
     }
+    #projOverlay .proj-gallery.gal-row img {
+      height: 260px;
+    }
   }
   @media (max-width: 600px) {
     #projOverlay .proj-images-wrap {
@@ -1048,6 +1072,13 @@ const overlayHTML = `
       max-width: 320px;
       gap: 6px;
       margin: 0 auto;
+    }
+    #projOverlay .proj-gallery.gal-row {
+      flex-wrap: wrap;
+    }
+    #projOverlay .proj-gallery.gal-row img {
+      flex: 0 0 calc(50% - 3px);   /* 2x2 — four across is unreadable at phone width */
+      height: 200px;
     }
     #projOverlay .proj-body-pad {
       padding: 36px 20px;
@@ -1115,7 +1146,8 @@ document.querySelectorAll('.proj-card').forEach(card => {
     const galEl = document.getElementById('projGallery');
     if (p.gallery && p.gallery.length) {
       galEl.innerHTML = p.gallery.map(src => `<img src="${src}" alt="${p.eye}" loading="lazy"/>`).join('');
-      galEl.style.display = 'grid';
+      galEl.classList.toggle('gal-row', p.galleryLayout === 'row');
+      galEl.style.display = p.galleryLayout === 'row' ? 'flex' : 'grid';
       document.querySelector('#projOverlay .proj-images-wrap').style.display = 'none';
     } else {
       galEl.innerHTML = '';
