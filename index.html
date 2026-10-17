@@ -4,6 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Preme Malaviphusit</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;1,9..144,200;1,9..144,300&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -58,6 +60,11 @@ nav.scrolled{border-color:var(--line)}
 #astCanvas{width:340px;height:420px;display:block}
 .hero-astronaut::after{content:'';position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:200px;height:20px;background:radial-gradient(ellipse,rgba(61,155,255,.35) 0%,transparent 70%);border-radius:50%;animation:shadowPulse 3s ease-in-out infinite alternate}
 @keyframes shadowPulse{from{opacity:.6;transform:translateX(-50%) scaleX(1)}to{opacity:.25;transform:translateX(-50%) scaleX(.75)}}
+
+
+/* PCB trace background */
+#pleatCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;display:block}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(180deg,rgba(4,12,24,.5) 0%,transparent 25%,transparent 80%,var(--bg) 100%),linear-gradient(90deg,rgba(4,12,24,.35) 0%,transparent 50%)}
 
 /* constellation */
 #conCanvas {
@@ -349,7 +356,7 @@ html {
 </nav>
 
 <section class="hero" id="home">
-  <div class="hero-grid"></div>
+  <canvas id="pleatCanvas" aria-hidden="true"></canvas>
   <canvas id="conCanvas"></canvas> <!--constellation-->
   <div class="hero-text">
     <p class="hero-eyebrow">Electrical and Computer Engineering Student @ NYU</p>
@@ -1408,6 +1415,146 @@ document.addEventListener('keydown', e => {
       },50);
     }
   };
+})();
+</script>
+<script>
+// ── PCB trace background: dim traces, glow + current pulses near the mouse
+(function(){
+  const cv=document.getElementById('pleatCanvas'); if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const hero=cv.parentElement;
+  const G=22;                       // routing grid (px)
+  const R=230;                      // glow radius (px)
+  const DIRS=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+  let W,H,dpr,traces=[],base,glow,tmp;
+
+  function build(){
+    dpr=Math.min(devicePixelRatio||1,2);
+    W=hero.clientWidth;H=hero.clientHeight;
+    cv.width=W*dpr;cv.height=H*dpr;
+    const cols=Math.ceil(W/G)+1,rows=Math.ceil(H/G)+1;
+    const occ=new Uint8Array(cols*rows);
+    const free=(x,y)=>x>=0&&y>=0&&x<cols&&y<rows&&!occ[y*cols+x];
+    traces=[];
+    let tries=0;
+    while(tries++<900){
+      // a bundle of parallel traces that share the same route shape
+      const n=1+(Math.random()*4|0);
+      let d=(Math.random()*4|0)*2;            // start straight (0,90,180,270)
+      const sx=Math.random()*cols|0,sy=Math.random()*rows|0;
+      const shape=[];let len=0,segs=2+(Math.random()*4|0),dd=d;
+      for(let i=0;i<segs;i++){const L=3+(Math.random()*12|0);shape.push([dd,L]);len+=L;dd=(dd+(Math.random()<.5?1:7))%8;}
+      const px=-DIRS[d][1],py=DIRS[d][0];     // perpendicular for bundle spacing
+      for(let k=0;k<n;k++){
+        let x=sx+px*k,y=sy+py*k;
+        if(!free(x,y)) break;
+        const pts=[[x,y]];occ[y*cols+x]=1;
+        outer: for(const [dir,L] of shape){
+          for(let i=0;i<L;i++){
+            const nx=x+DIRS[dir][0],ny=y+DIRS[dir][1];
+            if(!free(nx,ny)) break outer;
+            x=nx;y=ny;occ[y*cols+x]=1;
+            const last=pts[pts.length-1];
+            if(pts.length>1){const pr=pts[pts.length-2];
+              if(Math.sign(last[0]-pr[0])===DIRS[dir][0]&&Math.sign(last[1]-pr[1])===DIRS[dir][1]){last[0]=x;last[1]=y;continue;}}
+            pts.push([x,y]);
+          }
+        }
+        if(pts.length<2) continue;
+        const P=pts.map(([a,b])=>[a*G+.5,b*G+.5]);
+        let total=0;const seg=[];for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);seg.push(l);total+=l;}
+        if(total<G*3) continue;
+        traces.push({P,seg,total,w:Math.random()<.2?2.4:1.3,pulse:Math.random(),heat:0,
+          minx:Math.min(...P.map(q=>q[0])),maxx:Math.max(...P.map(q=>q[0])),miny:Math.min(...P.map(q=>q[1])),maxy:Math.max(...P.map(q=>q[1]))});
+      }
+    }
+    const mk=()=>{const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;const x=c.getContext('2d');x.scale(dpr,dpr);return [c,x];};
+    let bx,gx,tx;[base,bx]=mk();[glow,gx]=mk();[tmp,tx]=mk();tmp.x=tx;
+    drawTraces(bx,'rgba(61,155,255,0.065)','rgba(61,155,255,0.09)',0);tr=textRect();
+    drawTraces(gx,'rgba(100,175,255,0.4)','rgba(150,205,255,0.48)',3);
+  }
+  function drawTraces(x,stroke,pad,blur){
+    x.lineCap='round';x.lineJoin='round';
+    x.shadowColor='rgba(61,155,255,0.9)';x.shadowBlur=blur;
+    for(const t of traces){
+      x.strokeStyle=stroke;x.lineWidth=t.w;x.beginPath();
+      t.P.forEach(([a,b],i)=>i?x.lineTo(a,b):x.moveTo(a,b));x.stroke();
+      // pad at the end, via at the start
+      const e=t.P[t.P.length-1],s0=t.P[0];
+      x.strokeStyle=pad;x.lineWidth=1.3;
+      x.beginPath();x.arc(e[0],e[1],3.6,0,7);x.stroke();
+      x.fillStyle=pad;x.beginPath();x.arc(s0[0],s0[1],1.8,0,7);x.fill();
+    }
+  }
+  function sub(t,d0,d1){const out=[at(t,d0/t.total)];let acc=0;
+    for(let i=0;i<t.seg.length;i++){acc+=t.seg[i];if(acc>d0&&acc<d1)out.push(t.P[i+1]);}
+    out.push(at(t,d1/t.total));return out;}
+  let tr=null;
+  function textRect(){const el=hero.querySelector('.hero-text');if(!el)return null;const a=el.getBoundingClientRect(),c=cv.getBoundingClientRect();return {x:a.left-c.left,y:a.top-c.top,w:a.width,h:a.height};}
+  // 0..1 multiplier: dim near the text block
+  function calm(x,y){if(!tr)return 1;const dx=(x-(tr.x+tr.w*.45))/(tr.w*.75),dy=(y-(tr.y+tr.h*.5))/(tr.h*.75);return Math.min(1,.15+Math.hypot(dx,dy));}
+  function at(t,u){let d=u*t.total;for(let i=0;i<t.seg.length;i++){if(d<=t.seg[i]){const k=d/t.seg[i],a=t.P[i],b=t.P[i+1];return [a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k];}d-=t.seg[i];}return t.P[t.P.length-1];}
+
+  // light position: mouse, or a slow idle wander (mobile / no mouse yet)
+  let mx=-999,my=-999,tx=0,ty=0,lastMove=-1e9;
+  addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();tx=e.clientX-r.left;ty=e.clientY-r.top;lastMove=performance.now();},{passive:true});
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let vis=true,prev=performance.now();
+  new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis){prev=performance.now();requestAnimationFrame(frame);}}).observe(cv);
+
+  function frame(now){
+    const dt=Math.min((now-prev)/1000,.05);prev=now;
+    if(now-lastMove>3000){const k=now/1000;tx=W*(.68+.2*Math.sin(k*.23));ty=H*(.5+.3*Math.sin(k*.31+1));}
+    if(mx<-900){mx=tx;my=ty;}
+    mx+=(tx-mx)*.12;my+=(ty-my)*.12;
+
+    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.drawImage(base,0,0);
+    // glow layer, masked to a soft circle around the light
+    const x=tmp.x;x.save();x.setTransform(1,0,0,1,0,0);x.globalCompositeOperation='source-over';x.clearRect(0,0,tmp.width,tmp.height);
+    x.drawImage(glow,0,0);x.globalCompositeOperation='destination-in';
+    const g=x.createRadialGradient(mx*dpr,my*dpr,0,mx*dpr,my*dpr,R*dpr);
+    const cm=calm(mx,my);g.addColorStop(0,`rgba(0,0,0,${cm})`);g.addColorStop(.4,`rgba(0,0,0,${.4*cm})`);g.addColorStop(1,'rgba(0,0,0,0)');
+    x.fillStyle=g;x.fillRect(0,0,tmp.width,tmp.height);x.restore();
+    ctx.drawImage(tmp,0,0);
+
+    // current pulses on traces near the light
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.globalCompositeOperation='lighter';
+    for(const t of traces){
+      const near=mx>t.minx-R&&mx<t.maxx+R&&my>t.miny-R&&my<t.maxy+R;
+      t.heat+=((near?1:0)-t.heat)*Math.min(1,dt*3);
+      if(t.heat<.02) continue;
+      t.pulse=(t.pulse+dt*(90/(t.total+140)))%1;
+      // current: one smooth soft glow sliding along the trace (single path + gradient)
+      const Ls=140,head=t.pulse*(t.total+Ls),d0=Math.max(0,head-Ls),d1=Math.min(t.total,head);
+      if(d1<=d0) continue;
+      const pts=sub(t,d0,d1),A=pts[0],B=pts[pts.length-1];
+      const fall=Math.max(0,1-Math.hypot(B[0]-mx,B[1]-my)/R)*t.heat*calm(B[0],B[1]);
+      if(fall<=.01) continue;
+      const lg=ctx.createLinearGradient(A[0],A[1],B[0],B[1]);
+      const fadeIn=head>t.total?Math.max(0,1-(head-t.total)/Ls):1;
+      lg.addColorStop(0,'rgba(120,190,255,0)');lg.addColorStop(.7,`rgba(140,200,255,${.22*fall*fadeIn})`);lg.addColorStop(1,`rgba(170,215,255,${.32*fall*fadeIn})`);
+      ctx.strokeStyle=lg;ctx.lineWidth=t.w+1;ctx.lineCap='round';ctx.lineJoin='round';
+      ctx.shadowColor='rgba(61,155,255,.6)';ctx.shadowBlur=6;
+      ctx.beginPath();pts.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+    // keep the text area calm: fade traces out behind the hero text
+    if(tr){
+      ctx.globalCompositeOperation='destination-out';
+      const cx=tr.x+tr.w*.45,cy=tr.y+tr.h*.5;
+      ctx.save();ctx.translate(cx,cy);ctx.scale(1,tr.h/tr.w);
+      const rr=tr.w*.75,eg=ctx.createRadialGradient(0,0,0,0,0,rr);
+      eg.addColorStop(0,'rgba(0,0,0,.8)');eg.addColorStop(.6,'rgba(0,0,0,.55)');eg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=eg;ctx.fillRect(-rr,-rr,rr*2,rr*2);ctx.restore();
+    }
+    ctx.globalCompositeOperation='source-over';
+    if(vis&&!still) requestAnimationFrame(frame);
+  }
+  build();
+  let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{build();if(still)requestAnimationFrame(frame);},200);});
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
