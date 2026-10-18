@@ -22,7 +22,7 @@
   const BG = 0x040c18, ACCENT = 0x3d9bff, ACCENT2 = 0x80c8ff;
 
   /* ── renderer / scene ── */
-  const renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+  const renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: false })   // opaque canvas: nothing behind can bleed through;
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
   renderer.outputEncoding = T.sRGBEncoding;
   renderer.setClearColor(BG, 1);
@@ -367,10 +367,9 @@
     const fade = range(p, .88, .98);
     railMat.opacity = 1 - fade; railGlowMat.opacity = .25 * (1 - fade); tieMat.opacity = pillarMat.opacity = 1 - fade;
     grid.material.opacity = 1 - fade; stars.material.opacity = .7 * (1 - fade);
-    renderer.setClearColor(BG, 1 - range(p, .86, .97));
     scene.fog.density = .012 * (1 - fade);
     const carFade = range(p, .95, 1); car.scale.setScalar(lerp(1, 1.9, ease(range(p, .76, .8))) * (1 - carFade * .9));   // bigger in the wide side view
-    cv.style.opacity = 1 - range(p, .985, 1);
+    cv.style.opacity = 1 - range(p, .88, .99);   // fade to the site with CSS instead of canvas alpha
     if (nav) nav.style.opacity = range(p, .9, .99);
     ui.style.opacity = 1 - range(p, .8, .9);
     ui.style.pointerEvents = p > .85 ? 'none' : 'auto';
