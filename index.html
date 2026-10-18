@@ -305,6 +305,8 @@ html {
 .proj-pcb-drone{width:82%;right:-10%;top:50%}
 .proj-pcb-arc{width:78%;right:-8%}
 .proj-pcb-rogue{width:62%;right:-4%}
+.proj-pcb-payload{width:88%;right:-18%}
+.proj-card:hover .proj-pcb-payload{opacity:0.18;transform:translateY(-50%)}
 .proj-card:hover .proj-pcb-arc,.proj-card:hover .proj-pcb-rogue{opacity:0.18;transform:translateY(-50%)}
 .proj-card:hover .proj-pcb-drone{opacity:0.18;transform:translateY(-50%)}
 
@@ -427,35 +429,35 @@ html {
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="1">
-      <img src="Drone.png" alt="Drone Flight Controller PCB" class="proj-pcb-img proj-pcb-drone"/>
+      <img src="Payload_front.png" alt="NYU Rogue Aerospace payload PCB" class="proj-pcb-img proj-pcb-payload"/>
       <span class="proj-num">02</span>
+      <h3 class="proj-title">NYU Rogue Aerospace: <br>Payload Board</h3>
+      <p class="proj-desc">Designing the water-ejection payload for NYU’s rocketry team end to end — apogee detection, valve and motor actuation, embedded firmware, and a custom PCB taken from perfboard prototype to fabricated board.</p>
+      <div class="proj-tags"><span class="proj-tag">Payload Systems</span><span class="proj-tag">Altium Designer</span><span class="proj-tag">Embedded C</span><span class="proj-tag">Avionics</span></div>
+      <span href="#" class="proj-link">View project</span>
+    </div>
+    <div class="proj-card" data-id="2">
+      <img src="Drone.png" alt="Drone Flight Controller PCB" class="proj-pcb-img proj-pcb-drone"/>
+      <span class="proj-num">03</span>
       <h3 class="proj-title">Drone Flight Controller</h3>
       <p class="proj-desc">Custom STM32F405-based quadcopter flight controller PCB with 4-motor ESC outputs, USB-C programming, SWD debug interface, and a 5–36V wide-input power system.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32F405</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Power Systems</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
-    <div class="proj-card" data-id="2">
+    <div class="proj-card" data-id="3">
       <img src="pcb.png" alt="STM32F405 Development Board PCB" class="proj-pcb-img"/>
-      <span class="proj-num">03</span>
+      <span class="proj-num">04</span>
       <h3 class="proj-title">Custom STM32F405 Development Board</h3>
       <p class="proj-desc">Custom PCB projects spanning power management, sensor interfacing, and microcontroller breakout boards — from schematic capture to fabrication-ready Gerber files.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">PCB Layout &amp; Routing</span><span class="proj-tag">Schematic Design</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
-    <div class="proj-card" data-id="3">
+    <div class="proj-card" data-id="4">
       <img src="arc_logo.png" alt="NYU ARC Robotics Team Ultraviolet" class="proj-pcb-img proj-pcb-arc"/>
-      <span class="proj-num">04</span>
+      <span class="proj-num">05</span>
       <h3 class="proj-title">NYU ARC Robotics: <br>Team Ultraviolet</h3>
       <p class="proj-desc">Supporting electronics for NYU’s combat robotics team — LTspice simulation and bench validation of the supercapacitor power circuit, controller repair, and training new members on robot wiring.</p>
       <div class="proj-tags"><span class="proj-tag">LTspice</span><span class="proj-tag">Circuit Simulation</span><span class="proj-tag">Soldering</span> <span class="proj-tag">Team Training</span></div>
-      <span href="#" class="proj-link">View project</span>
-    </div>
-    <div class="proj-card" data-id="4">
-      <img src="rogue_logo.png" alt="NYU Rogue Aerospace" class="proj-pcb-img proj-pcb-rogue"/>
-      <span class="proj-num">05</span>
-      <h3 class="proj-title">NYU Rogue Aerospace</h3>
-      <p class="proj-desc">Designing the water-ejection payload for NYU’s rocketry team end to end — apogee detection, valve and motor actuation, embedded firmware, and a custom PCB taken from perfboard prototype to fabricated board.</p>
-      <div class="proj-tags"><span class="proj-tag">Payload Systems</span><span class="proj-tag">Altium Designer</span><span class="proj-tag">Embedded C</span><span class="proj-tag">Avionics</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="5">
@@ -900,7 +902,28 @@ const PROJECTS = [
     ]
   },
   {
-    num: '02 / 06', eye: 'PCB Design · Drone Systems',
+    num: '02 / 06', eye: 'Aerospace · Avionics',
+    title: 'NYU Rogue Aerospace: <em>Payload Board</em>',
+    link: 'https://www.nyurogueaerospace.com',
+    linkLabel: 'nyurogueaerospace.com',
+    tags: ['Payload Systems', 'Altium Designer', 'Embedded C', 'Avionics', 'GPS'],
+    img: './Payload_front.png',
+    imgBack: './Payload_back.png',
+    imgSize: '400px',
+    gallery: ['./rogue_team.jpg', './rogue1.jpg', './rogue2.jpg'],
+    desc: 'Designed the water-ejection payload for NYU’s competitive rocketry team end to end — system architecture, circuit design, embedded firmware, and the board itself. The payload detects apogee barometrically, opens a servo valve, then drives a motor to push water out of the tank. Took it from breadboard concept through a soldered perfboard build to a custom PCB, consolidating what had been an Arduino Nano, motor driver, and EasyMini altimeter into one LiPo-powered board. Also work on avionics and communications — GPS tracking and RF telemetry between the rocket and ground station — and spray-painted the competition airframe.',
+    highlights: [
+      { n:'01', t:'<strong>Full-stack payload design</strong> — carried the water-ejection system from architecture and circuit design through embedded programming, perfboard prototype, and custom PCB — concept to flight hardware.' },
+      { n:'02', t:'<strong>Barometric apogee detection</strong> — MS5611 pressure sensor with firmware that identifies apogee from the altitude curve and fires the deployment sequence autonomously.' },
+      { n:'03', t:'<strong>Two-stage ejection actuation</strong> — servo valve opens the tank, then a motor drives water out, sequenced and timed in firmware.' },
+      { n:'04', t:'<strong>Board consolidation</strong> — replaced a stack of Arduino Nano, motor driver, and EasyMini altimeter with a single LiPo-powered PCB, cutting wiring failure points and payload bay volume.' },
+      { n:'05', t:'<strong>Prototype → product workflow</strong> — validated each subsystem on breadboard, hand-soldered a perfboard revision for flight-condition testing, then committed the proven design to a fabricated PCB.' },
+      { n:'06', t:'<strong>GPS & RF telemetry</strong> — prepared and tested XBee modules for rocket tracking and ground-station data links during competition flights.' },
+      { n:'07', t:'<strong>Airframe finishing</strong> — spray-painted the competition rocket’s exterior.' },
+    ]
+  },
+  {
+    num: '03 / 06', eye: 'PCB Design · Drone Systems',
     title: 'Drone <em>Flight Controller</em>',
     tags: ['Altium Designer', 'STM32F405', 'PCB Layout & Routing', 'Power Systems'],
     desc: 'Designed a custom quadcopter flight controller PCB centered on the STM32F405 microcontroller. The board supports 4 brushless motor outputs (PWM ESC), a wide-range 5–36V power input with onboard regulation, USB-C for firmware flashing, SWD debug interface, BOOT and RESET buttons, and an iBUS receiver header — all routed in a compact octagonal form factor optimized for drone mounting.',
@@ -916,7 +939,7 @@ const PROJECTS = [
     ]
   },
   {
-    num: '03 / 06', eye: 'PCB Design · Electronics',
+    num: '04 / 06', eye: 'PCB Design · Electronics',
     title: 'Custom <em>PCB Design</em>',
     tags: ['Altium Designer', 'PCB Layout & Routing', 'Schematic Design'],
     desc: 'Designed a 2-layer STM32F405 development board in Altium Designer with breakout headers for SPI, I²C, UART, and ADC peripherals. Implemented a 24V→5V buck and 3.3V LDO power system for reliable MCU power delivery and integrated USB-C with ESD protection and differential pair routing, along with SWD debugging support.',
@@ -931,7 +954,7 @@ const PROJECTS = [
     ]
   },
   {
-    num: '04 / 06', eye: 'Robotics · Electronics',
+    num: '05 / 06', eye: 'Robotics · Electronics',
     title: 'NYU ARC Robotics: <em>Team Ultraviolet</em>',
     link: 'https://nyu-arc-robotics.com',
     linkLabel: 'nyu-arc-robotics.com',
@@ -944,24 +967,6 @@ const PROJECTS = [
       { n:'02', t:'<strong>Bench validation</strong> — tested the assembled capacitor bank with an oscilloscope, DC electronic load, and INA228 current sensing to confirm the design against simulation.' },
       { n:'03', t:'<strong>Controller repair</strong> — diagnosed and fixed team transmitters and receivers through soldering and rework, keeping the fleet operational through build season.' },
       { n:'04', t:'<strong>Team training</strong> — taught new members robot wiring and walked them through the circuit architecture so the team can debug power and signal paths independently.' },
-    ]
-  },
-  {
-    num: '05 / 06', eye: 'Aerospace · Avionics',
-    title: 'NYU Rogue <em>Aerospace</em>',
-    link: 'https://www.nyurogueaerospace.com',
-    linkLabel: 'nyurogueaerospace.com',
-    tags: ['Payload Systems', 'Altium Designer', 'Embedded C', 'Avionics', 'GPS'],
-    gallery: ['./rogue_team.jpg', './rogue1.jpg', './rogue2.jpg'],
-    desc: 'Designed the water-ejection payload for NYU’s competitive rocketry team end to end — system architecture, circuit design, embedded firmware, and the board itself. The payload detects apogee barometrically, opens a servo valve, then drives a motor to push water out of the tank. Took it from breadboard concept through a soldered perfboard build to a custom PCB, consolidating what had been an Arduino Nano, motor driver, and EasyMini altimeter into one LiPo-powered board. Also work on avionics and communications — GPS tracking and RF telemetry between the rocket and ground station — and spray-painted the competition airframe.',
-    highlights: [
-      { n:'01', t:'<strong>Full-stack payload design</strong> — carried the water-ejection system from architecture and circuit design through embedded programming, perfboard prototype, and custom PCB — concept to flight hardware.' },
-      { n:'02', t:'<strong>Barometric apogee detection</strong> — MS5611 pressure sensor with firmware that identifies apogee from the altitude curve and fires the deployment sequence autonomously.' },
-      { n:'03', t:'<strong>Two-stage ejection actuation</strong> — servo valve opens the tank, then a motor drives water out, sequenced and timed in firmware.' },
-      { n:'04', t:'<strong>Board consolidation</strong> — replaced a stack of Arduino Nano, motor driver, and EasyMini altimeter with a single LiPo-powered PCB, cutting wiring failure points and payload bay volume.' },
-      { n:'05', t:'<strong>Prototype → product workflow</strong> — validated each subsystem on breadboard, hand-soldered a perfboard revision for flight-condition testing, then committed the proven design to a fabricated PCB.' },
-      { n:'06', t:'<strong>GPS & RF telemetry</strong> — prepared and tested XBee modules for rocket tracking and ground-station data links during competition flights.' },
-      { n:'07', t:'<strong>Airframe finishing</strong> — spray-painted the competition rocket’s exterior.' },
     ]
   },
   {
@@ -1119,6 +1124,7 @@ const overlayHTML = `
       </div>
       <div class="proj-gallery" id="projGallery" style="display:none"></div>
     </div>
+    <div id="projGalleryBelow" style="display:none;gap:10px;margin-bottom:48px;flex-wrap:wrap"></div>
     <p style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#3d9bff;margin-bottom:12px">Key highlights</p>
     <div id="projHL" style="display:flex;flex-direction:column;gap:2px"></div>
   </div>
@@ -1151,7 +1157,15 @@ document.querySelectorAll('.proj-card').forEach(card => {
 
     // photo gallery (used by projects with no PCB render)
     const galEl = document.getElementById('projGallery');
-    if (p.gallery && p.gallery.length) {
+    const galBelow = document.getElementById('projGalleryBelow');
+    galBelow.innerHTML = ''; galBelow.style.display = 'none';
+    if (p.img && p.gallery && p.gallery.length) {
+      // board renders beside the text, team photos in a row underneath
+      galEl.innerHTML = ''; galEl.style.display = 'none';
+      document.querySelector('#projOverlay .proj-images-wrap').style.display = 'flex';
+      galBelow.innerHTML = p.gallery.map(src => `<img src="${src}" alt="${p.eye}" loading="lazy" style="height:240px;flex:1 1 260px;min-width:0;object-fit:cover;border:1px solid rgba(61,155,255,.12)" onerror="this.remove()"/>`).join('');
+      galBelow.style.display = 'flex';
+    } else if (p.gallery && p.gallery.length) {
       galEl.innerHTML = p.gallery.map(src => `<img src="${src}" alt="${p.eye}" loading="lazy"/>`).join('');
       galEl.classList.toggle('gal-row', p.galleryLayout === 'row');
       galEl.style.display = p.galleryLayout === 'row' ? 'flex' : 'grid';
@@ -1428,7 +1442,10 @@ document.addEventListener('keydown', e => {
   const DIRS=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
   let W,H,dpr,traces=[],base,glow,tmp;
 
+  // seeded RNG → same board layout every time (no reshuffle on resize)
+  let seed=1;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
   function build(){
+    seed=20260318;
     dpr=Math.min(devicePixelRatio||1,2);
     W=hero.clientWidth;H=hero.clientHeight;
     cv.width=W*dpr;cv.height=H*dpr;
@@ -1439,11 +1456,11 @@ document.addEventListener('keydown', e => {
     let tries=0;
     while(tries++<900){
       // a bundle of parallel traces that share the same route shape
-      const n=1+(Math.random()*4|0);
-      let d=(Math.random()*4|0)*2;            // start straight (0,90,180,270)
-      const sx=Math.random()*cols|0,sy=Math.random()*rows|0;
-      const shape=[];let len=0,segs=2+(Math.random()*4|0),dd=d;
-      for(let i=0;i<segs;i++){const L=3+(Math.random()*12|0);shape.push([dd,L]);len+=L;dd=(dd+(Math.random()<.5?1:7))%8;}
+      const n=1+(rnd()*4|0);
+      let d=(rnd()*4|0)*2;            // start straight (0,90,180,270)
+      const sx=rnd()*cols|0,sy=rnd()*rows|0;
+      const shape=[];let len=0,segs=2+(rnd()*4|0),dd=d;
+      for(let i=0;i<segs;i++){const L=3+(rnd()*12|0);shape.push([dd,L]);len+=L;dd=(dd+(rnd()<.5?1:7))%8;}
       const px=-DIRS[d][1],py=DIRS[d][0];     // perpendicular for bundle spacing
       for(let k=0;k<n;k++){
         let x=sx+px*k,y=sy+py*k;
@@ -1464,7 +1481,7 @@ document.addEventListener('keydown', e => {
         const P=pts.map(([a,b])=>[a*G+.5,b*G+.5]);
         let total=0;const seg=[];for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);seg.push(l);total+=l;}
         if(total<G*3) continue;
-        traces.push({P,seg,total,w:Math.random()<.2?2.4:1.3,pulse:Math.random(),heat:0,
+        traces.push({P,seg,total,w:rnd()<.2?2.4:1.3,pulse:rnd(),heat:0,
           minx:Math.min(...P.map(q=>q[0])),maxx:Math.max(...P.map(q=>q[0])),miny:Math.min(...P.map(q=>q[1])),maxy:Math.max(...P.map(q=>q[1]))});
       }
     }
@@ -1500,6 +1517,7 @@ document.addEventListener('keydown', e => {
   const noMouse=matchMedia('(hover:none)').matches;
   document.addEventListener('mouseleave',()=>{lastMove=-1e9;});
   addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();tx=e.clientX-r.left;ty=e.clientY-r.top;lastMove=performance.now();},{passive:true});
+  if(noMouse) addEventListener('scroll',()=>{const r=cv.getBoundingClientRect();tx=W*.72;ty=Math.min(H*.9,H*.25-r.top*1.1);lastMove=performance.now();if(!vis)return;},{passive:true});
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   let vis=true,prev=performance.now();
   new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis){prev=performance.now();requestAnimationFrame(frame);}}).observe(cv);
@@ -1509,7 +1527,6 @@ document.addEventListener('keydown', e => {
     // glow fades out after ~1.5s of no mouse movement, fades back in on move
     const idle=now-lastMove>1500;
     act+=((idle?0:1)-act)*Math.min(1,dt*(idle?1.2:5));
-    if(noMouse){const k=now/1000;tx=W*(.68+.2*Math.sin(k*.23));ty=H*(.5+.3*Math.sin(k*.31+1));act=.6;} // touch screens: slow drift
     if(mx<-900){mx=tx;my=ty;}
     mx+=(tx-mx)*.12;my+=(ty-my)*.12;
 
@@ -1558,7 +1575,7 @@ document.addEventListener('keydown', e => {
     if(vis&&!still) requestAnimationFrame(frame);
   }
   build();
-  let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{build();if(still)requestAnimationFrame(frame);},200);});
+  let rt,lastW=innerWidth;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;clearTimeout(rt);rt=setTimeout(()=>{build();if(still)requestAnimationFrame(frame);},200);});
   requestAnimationFrame(frame);
 })();
 </script>
