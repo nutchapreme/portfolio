@@ -124,7 +124,7 @@
       x.fillStyle = '#06142a'; x.beginPath(); x.arc(gx, gy, 55, 0, 7); x.fill();
       // coaster wave
       x.strokeStyle = '#80c8ff'; x.lineWidth = 14; x.lineCap = 'round'; x.beginPath();
-      for (let i = 0; i <= 100; i++) { const px = 520 + i * 6.4, py = gy + 40 - Math.sin(i / 100 * Math.PI * 1.6) * 110 * (i < 60 ? 1 : .6); i ? x.lineTo(px, py) : x.moveTo(px, py); } x.stroke();
+      x.moveTo(520, gy + 40); x.bezierCurveTo(640, gy - 60, 760, gy - 150, 880, gy - 60); x.bezierCurveTo(960, gy, 1060, gy + 90, 1160, gy + 75); x.stroke();   // one smooth hill + dip
       // loop
       x.beginPath(); x.arc(1300, gy - 10, 90, 0, Math.PI * 2); x.stroke();
       x.fillStyle = '#ddeeff'; x.font = `300 120px ${serif}`; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText('Preme', 1450, gy - 50);
