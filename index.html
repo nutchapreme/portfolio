@@ -163,6 +163,10 @@ section{padding:108px 52px;border-top:1px solid var(--line);position:relative;z-
 
 /* CAD */
 .cad-grid{display:flex;flex-direction:row;gap:24px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:rgba(61,155,255,.2) transparent}.cad-grid::-webkit-scrollbar{height:4px}.cad-grid::-webkit-scrollbar-track{background:transparent}.cad-grid::-webkit-scrollbar-thumb{background:rgba(61,155,255,.2);border-radius:2px}
+.cad-more{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.cad-more-arr{display:inline-block;animation:cadNudge 1.8s ease-in-out infinite alternate}
+@keyframes cadNudge{from{transform:translateX(0)}to{transform:translateX(8px)}}
+.cad-grid{cursor:grab}.cad-grid.dragging{cursor:grabbing;user-select:none}
 .cad-card{background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;transition:border-color .3s,box-shadow .3s;flex:0 0 420px;min-width:0}
 .cad-card:hover{border-color:rgba(61,155,255,.35);box-shadow:0 0 40px rgba(61,155,255,.08)}
 .cad-canvas-wrap{position:relative;height:260px;background:linear-gradient(135deg,#040e1e,#071a30)}
@@ -535,6 +539,7 @@ html {
   </div>
 
   <div class="art-panel" id="panel-cad">
+    <p class="cad-more reveal">Drag to see more <span class="cad-more-arr">→</span></p>
     <div class="cad-grid reveal">
       <div class="cad-card">
         <div class="cad-canvas-wrap"><canvas id="cadCanvas1"></canvas></div>
@@ -542,6 +547,16 @@ html {
           <h3 class="cad-title">Car Engine Assembly</h3>
           <p class="cad-desc">Full engine block assembly</p>
           <span class="cad-badge">Fusion 360 · STL</span>
+          <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
+        </div>
+      </div>
+
+      <div class="cad-card">
+        <div class="cad-canvas-wrap"><canvas id="cadCanvas4"></canvas><p id="cad4msg" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:11px;color:#4d6a90;letter-spacing:.06em">3D model loading…</p></div>
+        <div class="cad-info">
+          <h3 class="cad-title">Baby Rocket</h3>
+          <p class="cad-desc">Model rocket modeled in SolidWorks and simulated in OpenRocket on an E12-8 motor — 1.51 cal stability, ~1,676 ft predicted apogee, ~361 ft/s max velocity. 13.9 in long, 1.3 in diameter, 7.0 oz loaded.</p>
+          <span class="cad-badge">SolidWorks · OpenRocket</span>
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
         </div>
       </div>
@@ -566,15 +581,6 @@ html {
         </div>
       </div>
 
-      <div class="cad-card">
-        <div class="cad-canvas-wrap"><canvas id="cadCanvas4"></canvas><p id="cad4msg" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:11px;color:#4d6a90;letter-spacing:.06em">3D model loading…</p></div>
-        <div class="cad-info">
-          <h3 class="cad-title">Baby Rocket</h3>
-          <p class="cad-desc">Model rocket modeled in SolidWorks and simulated in OpenRocket on an E12-8 motor — 1.51 cal stability, ~1,676 ft predicted apogee, ~361 ft/s max velocity. 13.9 in long, 1.3 in diameter, 7.0 oz loaded.</p>
-          <span class="cad-badge">SolidWorks · OpenRocket</span>
-          <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1625,6 +1631,15 @@ document.addEventListener('keydown', e => {
   build();
   let rt,lastW=innerWidth;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;clearTimeout(rt);rt=setTimeout(()=>{build();if(still)requestAnimationFrame(frame);},200);});
   requestAnimationFrame(frame);
+})();
+
+// CAD row: drag to scroll (canvases keep their own drag-to-rotate)
+(function(){
+  const g=document.querySelector('.cad-grid'); if(!g) return;
+  let down=false,x0=0,s0=0;
+  g.addEventListener('mousedown',e=>{ if(e.target.tagName==='CANVAS') return; down=true; x0=e.clientX; s0=g.scrollLeft; g.classList.add('dragging'); });
+  addEventListener('mousemove',e=>{ if(down) g.scrollLeft=s0-(e.clientX-x0); });
+  addEventListener('mouseup',()=>{ down=false; g.classList.remove('dragging'); });
 })();
 </script>
 </body>
