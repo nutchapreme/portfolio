@@ -565,12 +565,23 @@ html {
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
         </div>
       </div>
+
+      <div class="cad-card">
+        <div class="cad-canvas-wrap"><canvas id="cadCanvas4"></canvas><p id="cad4msg" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:11px;color:#4d6a90;letter-spacing:.06em">3D model loading…</p></div>
+        <div class="cad-info">
+          <h3 class="cad-title">Baby Rocket</h3>
+          <p class="cad-desc">Model rocket modeled in SolidWorks and simulated in OpenRocket on an E12-8 motor — 1.51 cal stability, ~1,676 ft predicted apogee, ~361 ft/s max velocity. 13.9 in long, 1.3 in diameter, 7.0 oz loaded.</p>
+          <span class="cad-badge">SolidWorks · OpenRocket</span>
+          <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="art-panel" id="panel-td">
     <div class="td-intro reveal">
-      <p class="td-eyebrow">// Simulation</p>
+      <p class="td-eyebrow">// Motion &amp; simulation</p>
+      <p class="td-blurb">Real-time visuals and ride simulations — exploring how motion, light, and pacing shape what a guest experiences.</p>
     </div>
     <div class="td-grid reveal">
       <div class="td-card">
@@ -597,7 +608,7 @@ html {
             width="100%"
             height="100%"
             src="https://drive.google.com/file/d/1kNsGhwtbvTJjWM7NxaSnmL9B2lC_t7RV/preview"
-            title="First Ride — NoLimits 2 Ride Simulation"
+            title="First Park — NoLimits 2 Ride Simulation"
             frameborder="0"
             allow="autoplay"
             allowfullscreen
@@ -605,28 +616,9 @@ html {
           </iframe>
         </div>
         <div class="td-info">
-          <h3 class="td-title">First Ride</h3>
-          <p class="td-desc">My first roller coaster built and simulated in NoLimits 2 — designing the track layout and ride pacing, then capturing an on-ride POV run.</p>
+          <h3 class="td-title">First Park</h3>
+          <p class="td-desc">My first roller coaster park built and simulated in NoLimits 2 — designing the track layout and ride pacing, then capturing an on-ride POV run.</p>
           <span class="td-badge">NoLimits 2 · Ride Simulation</span>
-        </div>
-      </div>
-      <div class="td-card">
-        <div class="td-video-wrap">
-          <iframe
-            width="100%"
-            height="100%"
-            src="https://drive.google.com/file/d/1sIE-DuOsCm-UA-gEFDILe99F9bICs9Tz/preview"
-            title="RTL Verification"
-            frameborder="0"
-            allow="autoplay"
-            allowfullscreen
-            style="display:block;width:100%;height:100%;">
-          </iframe>
-        </div>
-        <div class="td-info">
-          <h3 class="td-title">RTL Verification</h3>
-          <p class="td-desc">Simulating and verifying Verilog RTL — running testbenches and checking waveforms to catch design bugs before hardware.</p>
-          <span class="td-badge">Verilog · RTL Simulation</span>
         </div>
       </div>
     </div>
@@ -1350,6 +1342,15 @@ document.addEventListener('keydown', e => {
   function parseSTL(buf) {
     const dv = new DataView(buf);
     const n = dv.getUint32(80, true);
+    if (84 + n * 50 !== buf.byteLength) {                      // ASCII STL
+      const txt = new TextDecoder().decode(buf), v = [], nn = [];
+      const re = /facet\s+normal\s+(\S+)\s+(\S+)\s+(\S+)[\s\S]*?vertex\s+(\S+)\s+(\S+)\s+(\S+)\s+vertex\s+(\S+)\s+(\S+)\s+(\S+)\s+vertex\s+(\S+)\s+(\S+)\s+(\S+)/g;
+      let m; while ((m = re.exec(txt))) { const f = m.slice(1).map(Number); for (let k = 0; k < 3; k++) { v.push(f[3+k*3], f[4+k*3], f[5+k*3]); nn.push(f[0], f[1], f[2]); } }
+      const g = new T.BufferGeometry();
+      g.setAttribute('position', new T.BufferAttribute(new Float32Array(v), 3));
+      g.setAttribute('normal', new T.BufferAttribute(new Float32Array(nn), 3));
+      return g;
+    }
     const pos = new Float32Array(n * 9), nor = new Float32Array(n * 9);
     let off = 84;
     for (let i = 0; i < n; i++) {
@@ -1368,7 +1369,7 @@ document.addEventListener('keydown', e => {
     return geo;
   }
 
-  function cadViewer(canvasId, preRotX) {
+  function cadViewer(canvasId, preRotX, rawBuf) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const wrap = canvas.parentElement;
@@ -1383,18 +1384,24 @@ document.addEventListener('keydown', e => {
     scene.add(new T.HemisphereLight(0x112244,0x0a1a30,1));
     const mat = new T.MeshStandardMaterial({color:0x7ab0d0,metalness:0.55,roughness:0.35,emissive:0x0a1525,emissiveIntensity:0.3});
 
-    const buf = b64ToBuffer(STL_DATA[canvasId]);
+    const buf = rawBuf || b64ToBuffer(STL_DATA[canvasId]);
     const geo = parseSTL(buf);
     if (preRotX) geo.rotateX(preRotX);   // bake starting orientation
     geo.computeBoundingBox();
+    if (rawBuf) {                        // long parts (rocket): lay the longest axis horizontal
+      const b = geo.boundingBox, dx = b.max.x-b.min.x, dy = b.max.y-b.min.y, dz = b.max.z-b.min.z;
+      if (dy >= dx && dy >= dz) geo.rotateZ(Math.PI/2); else if (dz >= dx && dz >= dy) geo.rotateY(Math.PI/2);
+      geo.computeBoundingBox();
+    }
     const box = geo.boundingBox;
     const cx=(box.max.x+box.min.x)/2, cy=(box.max.y+box.min.y)/2, cz=(box.max.z+box.min.z)/2;
     const sz = Math.max(box.max.x-box.min.x, box.max.y-box.min.y, box.max.z-box.min.z);
     const mesh = new T.Mesh(geo, mat); mesh.position.set(-cx,-cy,-cz);
     const pivot = new T.Group(); pivot.add(mesh); scene.add(pivot);
-    cam.position.set(0,0,sz*1.9); cam.lookAt(0,0,0);
+    const z0 = rawBuf ? sz*1.15 : sz*1.9;   // long, thin rocket: start closer
+    cam.position.set(0,0,z0); cam.lookAt(0,0,0);
 
-    let isDown=false, mx=0, my=0, rotX=0, rotY=0, zoom=sz*1.9;
+    let isDown=false, mx=0, my=0, rotX=0, rotY=0, zoom=z0;
     canvas.addEventListener('mousedown',e=>{isDown=true;mx=e.clientX;my=e.clientY;});
     window.addEventListener('mouseup',()=>isDown=false);
     window.addEventListener('mousemove',e=>{
@@ -1463,6 +1470,10 @@ document.addEventListener('keydown', e => {
         cadViewer('cadCanvas1', -Math.PI/2);  // engine: start on the cylinder/crank side
         cadViewer('cadCanvas2');
         cadViewer('cadCanvas3');
+        const msg = document.getElementById('cad4msg');
+        fetch('baby_rocket.stl').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+          .then(b => cadViewer('cadCanvas4', 0, b))
+          .catch(() => { msg.style.display = 'flex'; msg.textContent = 'Add baby_rocket.stl next to index.html to show the 3D model'; });
       },50);
     }
   };
