@@ -163,6 +163,10 @@ section{padding:108px 52px;border-top:1px solid var(--line);position:relative;z-
 
 /* CAD */
 .cad-grid{display:flex;flex-direction:row;gap:24px;overflow-x:auto;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:rgba(61,155,255,.2) transparent}.cad-grid::-webkit-scrollbar{height:4px}.cad-grid::-webkit-scrollbar-track{background:transparent}.cad-grid::-webkit-scrollbar-thumb{background:rgba(61,155,255,.2);border-radius:2px}
+.cad-more{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.cad-more-arr{display:inline-block;animation:cadNudge 1.8s ease-in-out infinite alternate}
+@keyframes cadNudge{from{transform:translateX(0)}to{transform:translateX(8px)}}
+.cad-grid{cursor:grab}.cad-grid.dragging{cursor:grabbing;user-select:none}
 .cad-card{background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;transition:border-color .3s,box-shadow .3s;flex:0 0 420px;min-width:0}
 .cad-card:hover{border-color:rgba(61,155,255,.35);box-shadow:0 0 40px rgba(61,155,255,.08)}
 .cad-canvas-wrap{position:relative;height:260px;background:linear-gradient(135deg,#040e1e,#071a30)}
@@ -370,6 +374,25 @@ html {
 @media(max-width:1100px){.about-grid{grid-template-columns:1fr}.holo-stage{margin:0 auto}}
 @media(max-width:900px){.holo-stage{display:none}.tools-list{display:block}.tools-hint{display:none}.tools{margin-top:8px}}
 @media(prefers-reduced-motion:reduce){.holo.on .holo-proj{animation:none}}
+
+
+/* resume viewer */
+#resumeModal{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;padding:28px;background:rgba(2,6,14,.78);backdrop-filter:blur(8px)}
+#resumeModal.open{display:flex;animation:rmIn .3s ease}
+@keyframes rmIn{from{opacity:0}to{opacity:1}}
+.rm-box{width:min(860px,100%);height:min(92vh,1100px);display:flex;flex-direction:column;background:var(--card);border:1px solid rgba(61,155,255,.3);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(61,155,255,.12);animation:rmUp .4s cubic-bezier(.22,1,.36,1)}
+@keyframes rmUp{from{transform:translateY(24px) scale(.98)}to{transform:none}}
+.rm-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.rm-title{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:var(--ink)}
+.rm-actions{display:flex;gap:8px;align-items:center}
+.rm-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:9px 16px;color:var(--accent2);background:rgba(61,155,255,.08);border:1px solid rgba(61,155,255,.3);text-decoration:none;cursor:pointer;transition:background .2s,color .2s}
+.rm-btn:hover{background:rgba(61,155,255,.18);color:var(--ink)}
+.rm-btn.solid{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.rm-btn.solid:hover{background:var(--accent2);color:var(--bg)}
+.rm-close{background:none;border:0;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:4px 6px}
+.rm-close:hover{color:var(--ink)}
+.rm-frame{flex:1;width:100%;border:0;background:#fff}
+@media(max-width:600px){#resumeModal{padding:10px}.rm-box{height:88vh}.rm-btn.tab{display:none}}
 </style>
 </head>
 
@@ -637,6 +660,7 @@ html {
   </div>
 
   <div class="art-panel" id="panel-cad">
+    <p class="cad-more reveal">Drag to see more <span class="cad-more-arr">→</span></p>
     <div class="cad-grid reveal">
       <div class="cad-card">
         <div class="cad-canvas-wrap"><canvas id="cadCanvas1"></canvas></div>
@@ -644,6 +668,16 @@ html {
           <h3 class="cad-title">Car Engine Assembly</h3>
           <p class="cad-desc">Full engine block assembly</p>
           <span class="cad-badge">Fusion 360 · STL</span>
+          <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
+        </div>
+      </div>
+
+      <div class="cad-card">
+        <div class="cad-canvas-wrap"><canvas id="cadCanvas4"></canvas><p id="cad4msg" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:11px;color:#4d6a90;letter-spacing:.06em">3D model loading…</p></div>
+        <div class="cad-info">
+          <h3 class="cad-title">Baby Rocket</h3>
+          <p class="cad-desc">Model rocket modeled in SolidWorks and simulated in OpenRocket on an E12-8 motor — 1.51 cal stability, ~1,676 ft predicted apogee, ~361 ft/s max velocity. 13.9 in long, 1.3 in diameter, 7.0 oz loaded.</p>
+          <span class="cad-badge">SolidWorks · OpenRocket</span>
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
         </div>
       </div>
@@ -667,6 +701,7 @@ html {
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -766,12 +801,12 @@ html {
       </div>
       <div class="cc-arrow">↗</div>
     </a>
-    <a href="resume.pdf" download="resume.pdf" class="contact-card resume">
+    <a href="resume.pdf" id="resumeCard" class="contact-card resume" aria-haspopup="dialog">
       <div class="cc-left">
         <div class="cc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
-        <div><p class="cc-label">Download</p><p class="cc-value">Resume</p></div>
+        <div><p class="cc-label">View</p><p class="cc-value">Resume</p></div>
       </div>
-      <div class="cc-arrow">↓</div>
+      <div class="cc-arrow">↗</div>
     </a>
   </div>
   <div class="overlay" id="overlay">
@@ -789,6 +824,21 @@ html {
     </div>
   </div>
 </section>
+
+
+<div id="resumeModal" role="dialog" aria-modal="true" aria-label="Resume">
+  <div class="rm-box">
+    <div class="rm-bar">
+      <span class="rm-title">Resume</span>
+      <div class="rm-actions">
+        <a class="rm-btn tab" href="resume.pdf" target="_blank" rel="noopener">Open in new tab ↗</a>
+        <a class="rm-btn solid" href="resume.pdf" download="Preme_Malaviphusit_Resume.pdf">Download ↓</a>
+        <button class="rm-close" type="button" aria-label="Close">×</button>
+      </div>
+    </div>
+    <iframe class="rm-frame" title="Resume preview"></iframe>
+  </div>
+</div>
 
 <footer>
   <p>© 2026 Preme Malaviphusit</p>
@@ -1452,6 +1502,15 @@ document.addEventListener('keydown', e => {
   function parseSTL(buf) {
     const dv = new DataView(buf);
     const n = dv.getUint32(80, true);
+    if (84 + n * 50 !== buf.byteLength) {                      // ASCII STL
+      const txt = new TextDecoder().decode(buf), v = [], nn = [];
+      const re = /facet\s+normal\s+(\S+)\s+(\S+)\s+(\S+)[\s\S]*?vertex\s+(\S+)\s+(\S+)\s+(\S+)\s+vertex\s+(\S+)\s+(\S+)\s+(\S+)\s+vertex\s+(\S+)\s+(\S+)\s+(\S+)/g;
+      let m; while ((m = re.exec(txt))) { const f = m.slice(1).map(Number); for (let k = 0; k < 3; k++) { v.push(f[3+k*3], f[4+k*3], f[5+k*3]); nn.push(f[0], f[1], f[2]); } }
+      const g = new T.BufferGeometry();
+      g.setAttribute('position', new T.BufferAttribute(new Float32Array(v), 3));
+      g.setAttribute('normal', new T.BufferAttribute(new Float32Array(nn), 3));
+      return g;
+    }
     const pos = new Float32Array(n * 9), nor = new Float32Array(n * 9);
     let off = 84;
     for (let i = 0; i < n; i++) {
@@ -1470,7 +1529,7 @@ document.addEventListener('keydown', e => {
     return geo;
   }
 
-  function cadViewer(canvasId, preRotX) {
+  function cadViewer(canvasId, preRotX, rawBuf) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const wrap = canvas.parentElement;
@@ -1485,16 +1544,22 @@ document.addEventListener('keydown', e => {
     scene.add(new T.HemisphereLight(0x112244,0x0a1a30,1));
     const mat = new T.MeshStandardMaterial({color:0x7ab0d0,metalness:0.55,roughness:0.35,emissive:0x0a1525,emissiveIntensity:0.3});
 
-    const buf = b64ToBuffer(STL_DATA[canvasId]);
+    const buf = rawBuf || b64ToBuffer(STL_DATA[canvasId]);
     const geo = parseSTL(buf);
     if (preRotX) geo.rotateX(preRotX);   // bake starting orientation
     geo.computeBoundingBox();
+    if (rawBuf) {                        // long parts (rocket): lay the longest axis horizontal
+      const b = geo.boundingBox, dx = b.max.x-b.min.x, dy = b.max.y-b.min.y, dz = b.max.z-b.min.z;
+      if (dy >= dx && dy >= dz) geo.rotateZ(Math.PI/2); else if (dz >= dx && dz >= dy) geo.rotateY(Math.PI/2);
+      geo.computeBoundingBox();
+    }
     const box = geo.boundingBox;
     const cx=(box.max.x+box.min.x)/2, cy=(box.max.y+box.min.y)/2, cz=(box.max.z+box.min.z)/2;
     const sz = Math.max(box.max.x-box.min.x, box.max.y-box.min.y, box.max.z-box.min.z);
     const mesh = new T.Mesh(geo, mat); mesh.position.set(-cx,-cy,-cz);
     const pivot = new T.Group(); pivot.add(mesh); scene.add(pivot);
-    cam.position.set(0,0,sz*1.9); cam.lookAt(0,0,0);
+    const z0 = rawBuf ? sz*1.15 : sz*1.9;   // long, thin rocket: start closer
+    cam.position.set(0,0,z0); cam.lookAt(0,0,0);
 
     let isDown=false, mx=0, my=0, rotX=0, rotY=0, zoom=sz*1.9;
     canvas.addEventListener('mousedown',e=>{isDown=true;mx=e.clientX;my=e.clientY;});
@@ -1565,6 +1630,10 @@ document.addEventListener('keydown', e => {
         cadViewer('cadCanvas1', -Math.PI/2);  // engine: start on the cylinder/crank side
         cadViewer('cadCanvas2');
         cadViewer('cadCanvas3');
+        const msg = document.getElementById('cad4msg');
+        fetch('baby_rocket.stl').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+          .then(b => cadViewer('cadCanvas4', 0, b))
+          .catch(() => { msg.style.display = 'flex'; msg.textContent = 'Add baby_rocket.stl next to index.html to show the 3D model'; });
       },50);
     }
   };
@@ -1728,6 +1797,30 @@ document.addEventListener('keydown', e => {
 })();
 </script>
 <script src="js/GLTFLoader.js"></script>
-<script src="js/ride.js"></script>
+<script src="js/ride.js">
+</script>
+<script>
+// Resume: open a preview first, download from inside it
+(function(){
+  const m=document.getElementById('resumeModal'), card=document.getElementById('resumeCard'); if(!m||!card) return;
+  const fr=m.querySelector('.rm-frame');
+  const open=e=>{e.preventDefault(); if(!fr.src) fr.src='resume.pdf#view=FitH'; m.classList.add('open'); document.body.style.overflow='hidden'; m.querySelector('.rm-btn.solid').focus();};
+  const close=()=>{m.classList.remove('open'); document.body.style.overflow=''; card.focus();};
+  card.addEventListener('click',open);
+  m.querySelector('.rm-close').addEventListener('click',close);
+  m.addEventListener('click',e=>{if(e.target===m) close();});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&m.classList.contains('open')) close();});
+})();
+</script>
+<script>
+// CAD row: drag to scroll (canvases keep their own drag-to-rotate)
+(function(){
+  const g=document.querySelector('.cad-grid'); if(!g) return;
+  let down=false,x0=0,s0=0;
+  g.addEventListener('mousedown',e=>{ if(e.target.tagName==='CANVAS') return; down=true; x0=e.clientX; s0=g.scrollLeft; g.classList.add('dragging'); });
+  addEventListener('mousemove',e=>{ if(down) g.scrollLeft=s0-(e.clientX-x0); });
+  addEventListener('mouseup',()=>{ down=false; g.classList.remove('dragging'); });
+})();
+</script>
 </body>
 </html>
