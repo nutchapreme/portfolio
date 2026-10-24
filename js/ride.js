@@ -105,6 +105,13 @@
     const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); draw(x, w, h);
     const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 8; return t;
   }
+  // soft radial glow computed in a shader (no texture → no speckle/dot artifacts on some GPUs)
+  function glowMat(color, strength) {
+    return new T.ShaderMaterial({ transparent: true, depthWrite: false, fog: false,
+      uniforms: { c: { value: new T.Color(color) }, a: { value: strength } },
+      vertexShader: 'varying vec2 v; void main(){ v = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }',
+      fragmentShader: 'uniform vec3 c; uniform float a; varying vec2 v; void main(){ float d = length(v - .5) * 2.; float k = pow(max(0., 1. - d), 2.2); gl_FragColor = vec4(c, k * a); }' });
+  }
   const serif = "'Fraunces', Georgia, serif", mono = "'DM Mono', ui-monospace, monospace";
   function signTex(text, sub) {
     return canvasTex(1024, 400, (x, w, h) => {
@@ -151,7 +158,97 @@
     for (const sx of [-3.2, 3.2]) { const p = new T.Mesh(new T.CylinderGeometry(.09, .09, 6, 8), postMat); p.position.set(sx, 2.4, 0); arch.add(p); }
     arch.position.set(0, 0, -20); station.add(arch); signs.push(arch);
   }
-  buildSigns(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(buildSigns);
+  station.visible = false;   // old platform + signs retired; the boarding hall below replaces them
+
+  /* ── "Preme's Space" boarding hall — flat, cel-shaded Tron look (unlit colours + glowing outlines) ── */
+  const hall = new T.Group(); scene.add(hall);
+  const FLAT = c => new T.MeshBasicMaterial({ color: c });
+  const LINE = (c, o = 1) => new T.LineBasicMaterial({ color: c, transparent: o < 1, opacity: o });
+  const NEON = new T.MeshBasicMaterial({ color: 0xe6f6ff });
+  const NEON_B = new T.MeshBasicMaterial({ color: ACCENT2 });
+  const outline = (mesh, c = 0xbfe6ff, o = .9) => { const e = new T.LineSegments(new T.EdgesGeometry(mesh.geometry, 20), LINE(c, o)); mesh.add(e); return mesh; };
+  const tubeAlong = (pts, r, mat) => { const path = new T.CurvePath(); for (let i = 1; i < pts.length; i++) path.add(new T.LineCurve3(pts[i - 1], pts[i])); return new T.Mesh(new T.TubeGeometry(path, pts.length * 6, r, 6, false), mat); };
+  {
+    // floor + glowing lane edges + chevrons pointing out of the station
+    const floor = new T.Mesh(new T.BoxGeometry(12, .3, 34), FLAT(0x01040c)); floor.position.set(0, -.6, 4); hall.add(floor);
+    for (const x of [-1.25, 1.25, -5.2, 5.2]) { const st = new T.Mesh(new T.BoxGeometry(.06, .02, 34), NEON_B); st.position.set(x, -.44, 4); hall.add(st); }
+    for (let z = 18; z > -10; z -= 6.4) for (const x of [-3.4, 3.4]) {
+      const ch = tubeAlong([new T.Vector3(x - .35, -.43, z + .3), new T.Vector3(x, -.43, z - .1), new T.Vector3(x + .35, -.43, z + .3)], .03, NEON_B); hall.add(ch);
+    }
+    // hex light portals over the track (the Tron launch tunnel)
+    const portal = [[-3, -.45], [-3, 2.6], [-2.1, 3.9], [2.1, 3.9], [3, 2.6], [3, -.45]].map(([x, y]) => new T.Vector3(x, y, 0));
+    for (let i = 0; i < 4; i++) {
+      const z = 12 - i * 7, k = 1 + i * .015;
+      const pg = new T.Group(); pg.position.z = z; pg.scale.set(k, k, 1);
+      pg.add(tubeAlong(portal, .035, i === 0 ? NEON : NEON_B));
+      hall.add(pg);
+    }
+    // glass queue rails both sides (glowing cyan panels with white frames)
+    const glass = new T.MeshBasicMaterial({ color: 0x2f8cff, transparent: true, opacity: .14, depthWrite: false, side: T.DoubleSide });
+    for (const side of [-1, 1]) for (let i = 0; i < 7; i++) {
+      const pnl = outline(new T.Mesh(new T.BoxGeometry(.06, 1.05, 2.3), glass), 0x3d9bff, .5);
+      pnl.position.set(side * 2.35, .1, 16 - i * 2.6); hall.add(pnl);
+    }
+    // canopy: triangular lattice glowing overhead
+    const lat = [], S = 2.2;
+    for (let r = -1; r < 13; r++) for (let q = -4; q < 4; q++) {
+      const x = q * S + (r % 2 ? S / 2 : 0), z = 18 - r * S * .87;
+      lat.push(x, 6.2, z, x + S, 6.2, z, x, 6.2, z, x + S / 2, 6.2, z - S * .87, x + S, 6.2, z, x + S / 2, 6.2, z - S * .87);
+    }
+    const lg = new T.BufferGeometry(); lg.setAttribute('position', new T.Float32BufferAttribute(lat, 3));
+    hall.add(new T.LineSegments(lg, LINE(ACCENT, .3)));
+    // walls: deep navy with neon trim, so the hall reads as an interior
+    for (const side of [-1, 1]) {
+      const wall = outline(new T.Mesh(new T.BoxGeometry(.2, 6.6, 34), FLAT(0x020713)), 0x3d9bff, .8); wall.position.set(side * 6, 2.8, 4); hall.add(wall);
+      for (const y of [1.2, 4.4]) { const tr = new T.Mesh(new T.BoxGeometry(.04, .05, 34), NEON_B); tr.position.set(side * 5.88, y, 4); hall.add(tr); }
+    }
+    // enclose the hall: extend floor/walls back behind the camera + a solid ceiling, so you never see outside
+    { const L = 44, zc = 21 + L / 2;
+      const fl = new T.Mesh(new T.BoxGeometry(12, .3, L), FLAT(0x01040c)); fl.position.set(0, -.6, zc); hall.add(fl);
+      for (const side of [-1, 1]) { const w = new T.Mesh(new T.BoxGeometry(.2, 7.2, L), FLAT(0x020713)); w.position.set(side * 6, 3.1, zc); hall.add(w);
+        for (const y of [1.2, 4.4]) { const tr = new T.Mesh(new T.BoxGeometry(.04, .05, L), NEON_B); tr.position.set(side * 5.88, y, zc); hall.add(tr); } }
+      for (const x of [-1.25, 1.25, -5.2, 5.2]) { const st = new T.Mesh(new T.BoxGeometry(.06, .02, L), NEON_B); st.position.set(x, -.44, zc); hall.add(st); }
+      const ceil = new T.Mesh(new T.BoxGeometry(12.4, .2, 34 + L), FLAT(0x01030a)); ceil.position.set(0, 6.6, 4 + L / 2); hall.add(ceil);
+      const back = new T.Mesh(new T.BoxGeometry(12.4, 7.4, .2), FLAT(0x01030a)); back.position.set(0, 3, 21 + L); hall.add(back); }
+    // "Welcome to Preme's Space" sign
+    const signT = canvasTex(1024, 420, (x, w, h) => {
+      x.fillStyle = '#071833'; x.fillRect(0, 0, w, h);
+      x.strokeStyle = '#e6f6ff'; x.lineWidth = 10; x.strokeRect(18, 18, w - 36, h - 36);
+      x.strokeStyle = '#3d9bff'; x.lineWidth = 4; x.strokeRect(38, 38, w - 76, h - 76);
+      x.fillStyle = '#80c8ff'; x.font = `48px ${mono}`; x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.fillText('WELCOME TO', 80, 150);
+      x.fillStyle = '#ffffff'; x.font = `italic 300 150px ${serif}`; x.fillText("Preme's Space", 70, 318);
+    });
+    const sign = outline(new T.Mesh(new T.BoxGeometry(3.8, 1.56, .08), [FLAT(0x020814), FLAT(0x020814), FLAT(0x020814), FLAT(0x020814), new T.MeshBasicMaterial({ map: signT }), FLAT(0x020814)]), 0xe6f6ff, 1);
+    sign.position.set(-3.65, 4.1, 8); sign.rotation.y = .32; hall.add(sign);
+    hall.userData.sign = sign;
+    // futuristic boarding kiosk (left) with a live screen
+    const kc = document.createElement('canvas'); kc.width = 512; kc.height = 640; const kx = kc.getContext('2d');
+    const kTex = new T.CanvasTexture(kc); kTex.encoding = T.sRGBEncoding;
+    hall.userData.drawKiosk = (t) => {
+      kx.fillStyle = '#061633'; kx.fillRect(0, 0, 512, 640);
+      kx.strokeStyle = '#80c8ff'; kx.lineWidth = 6; kx.strokeRect(14, 14, 484, 612);
+      kx.fillStyle = '#80c8ff'; kx.font = `34px ${mono}`; kx.fillText('NOW BOARDING', 44, 82);
+      kx.fillStyle = '#e6f6ff'; kx.font = `300 64px ${serif}`; kx.fillText('Preme', 44, 176); kx.fillStyle = '#3d9bff'; kx.font = `italic 300 64px ${serif}`; kx.fillText('Express', 44, 246);
+      kx.strokeStyle = '#3d9bff'; kx.lineWidth = 4; kx.beginPath();
+      for (let i = 0; i <= 60; i++) { const px = 44 + i * 7, py = 380 + Math.sin(i * .35 + t * 3) * 34 * Math.sin(i * .09 + t); i ? kx.lineTo(px, py) : kx.moveTo(px, py); } kx.stroke();
+      kx.fillStyle = '#80c8ff'; kx.font = `26px ${mono}`;
+      ['ECE · NYU TANDON', 'CAR 01 · SEAT A', 'SCROLL TO BOARD ▸'].forEach((l, i) => kx.fillText(l, 44, 492 + i * 44));
+      kTex.needsUpdate = true;
+    };
+    hall.userData.drawKiosk(0);
+    const kiosk = new T.Group();
+    const kb = outline(new T.Mesh(new T.BoxGeometry(1.5, 2.3, .5), FLAT(0x030b1e)), 0xe6f6ff, 1); kb.position.y = .7; kiosk.add(kb);
+    const scr = new T.Mesh(new T.PlaneGeometry(1.25, 1.56), new T.MeshBasicMaterial({ map: kTex })); scr.position.set(0, .82, .26); kiosk.add(scr);
+    const base = outline(new T.Mesh(new T.BoxGeometry(1.9, .16, .9), FLAT(0x030b1e)), 0x80c8ff, 1); base.position.y = -.38; kiosk.add(base);
+    kiosk.position.set(-3.6, 0, 12.6); kiosk.rotation.y = .38; hall.add(kiosk);
+    // exit glow at the far end ("going out")
+    const exitG = new T.Mesh(new T.PlaneGeometry(9, 6), glowMat(0x6fb6ff, .55));
+    exitG.position.set(0, 2, -12.6); hall.add(exitG);
+    // dark curtain over the exit — you only see the track outside once the car heads out
+    const curtain = new T.Mesh(new T.PlaneGeometry(12.6, 7.6), new T.MeshBasicMaterial({ color: 0x01030a, transparent: true, opacity: 1, fog: false }));
+    curtain.position.set(0, 3, -13); hall.add(curtain); hall.userData.curtain = curtain;
+  }
+
 
   /* ── rocket car (from your sketch: cockpit dip, nose cone, tail fin, side stripes, bogies) + rider ── */
   const car = new T.Group(); scene.add(car);
@@ -255,9 +352,7 @@
   /* ── the SharkFin board (real model, flat-render fallback) ── */
   const BOARD_POS = new T.Vector3(10, 7.2, -152), BW = 8.4;
   const boardG = new T.Group(); boardG.position.copy(BOARD_POS); scene.add(boardG);
-  const halo = new T.Mesh(new T.PlaneGeometry(BW * 2.4, BW * 1.5), new T.MeshBasicMaterial({
-    map: canvasTex(256, 256, (x) => { const g = x.createRadialGradient(128, 128, 0, 128, 128, 128); g.addColorStop(0, 'rgba(61,155,255,.4)'); g.addColorStop(1, 'rgba(61,155,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 256); }),
-    transparent: true, depthWrite: false, fog: false }));
+  const halo = new T.Mesh(new T.PlaneGeometry(BW * 2.4, BW * 1.5), glowMat(0x3d9bff, .45));
   halo.position.copy(BOARD_POS).add(new T.Vector3(0, 0, -2)); scene.add(halo);
   const parts = [];
   const boardInner = new T.Group(); boardG.add(boardInner);
@@ -313,11 +408,32 @@
   }
   const mix = (a, b, t) => ({ pos: a.pos.clone().lerp(b.pos, t), look: a.look.clone().lerp(b.look, t) });
 
+  /* ── intro camera: dolly-zoom from flat (tele) to deep perspective ── */
+  let pmx = 0, pmy = 0, smx = 0, smy = 0, lastMove = -1e9;
+  addEventListener('mousemove', e => { pmx = e.clientX / innerWidth * 2 - 1; pmy = e.clientY / innerHeight * 2 - 1; lastMove = performance.now(); }, { passive: true });
+  const noHover = matchMedia('(hover:none)').matches;
+  function introPose(t) {
+    if (noHover) { pmx = Math.sin(t * .35) * .7; pmy = Math.sin(t * .23) * .25; }   // phones: slow automatic sway
+    smx += (pmx - smx) * .06; smy += (pmy - smy) * .06;
+    const bend = clamp(Math.hypot(smx, smy * 1.4));                // 0 = flat 2D, 1 = full perspective
+    const fov = lerp(9, 58, ease(bend));
+    const target = curve.getPointAt(0).add(tmp2.set(0, 2.1, -6));
+    const frameH = aspect < 1 ? 9.5 / Math.max(.5, aspect) * .62 : 9.5;
+    const dist = (frameH / 2) / Math.tan(fov * Math.PI / 360);
+    const yaw = smx * .35, pitch = -smy * .12;
+    const pos = target.clone().add(tmp.set(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch) + .06, Math.cos(yaw) * Math.cos(pitch)).multiplyScalar(dist));
+    pos.set(clamp(pos.x, -5.2, 5.2), clamp(pos.y, .3, 5.8), Math.min(pos.z, 63));   // stay inside the hall
+    return { pos, look: target.clone(), fov };
+  }
+  const P0 = .15;   // share of the scroll used by the boarding intro
+  const warp = q => q < .12 ? q / .12 * .25 : .25 + (q - .12) / .88 * .75;   // faster track section before the board
+
   /* ── scroll → timeline ── */
   function progress() { const h = spacer.offsetHeight; return clamp(scrollY / h); }
   let running = true, lastP = -1;
   function frameLoop(now) {
-    const t = now / 1000, p = progress();
+    const t = now / 1000, pRaw = progress(), intro = pRaw < P0, p = intro ? 0 : warp((pRaw - P0) / (1 - P0));
+    const k = ease(range(pRaw, .01, P0));   // 0 = boarding shot, 1 = inside the helmet
 
     // car progress along the track
     let u;
@@ -329,7 +445,7 @@
     const f = carAt(u);
 
     // rider: hidden in POV, arms up for the drop
-    rider.visible = p > .2;
+    rider.visible = intro ? k < .82 : p > .2;
     const up = ease(range(p, .74, .8));
     for (const a of arms) { a.pivot.rotation.x = -.55 - up * 2.25; a.pivot.rotation.z = -a.sx * up * .3; }
     { const burn = .25 + .75 * range(p, .74, .8) + Math.sin(t * 40) * .06; flame.scale.set(1, .5 + burn * 1.6, 1); flame.position.z = 1.8 + .25 * burn * 1.6; flameCore.scale.set(1, .4 + burn, 1); flameMat.opacity = .5 + .4 * burn; }
@@ -350,6 +466,14 @@
     cam.position.copy(c.pos).add(tmp.set(Math.sin(t * 23) * shake, Math.cos(t * 19) * shake, 0));
     cam.lookAt(c.look);
     cam.fov = p < .25 ? 68 : lerp(68, 48, ease(range(p, .25, .42))); if (p > .69) cam.fov = lerp(48, 50, range(p, .69, .76));
+    if (intro) {                         // boarding hall → zoom into the astronaut's POV
+      const ip = introPose(t), kk = k * k * (3 - 2 * k);
+      const povPos = c.pos, povLook = c.look;
+      cam.position.copy(ip.pos).lerp(povPos, kk);
+      cam.lookAt(ip.look.clone().lerp(povLook, kk));
+      cam.fov = lerp(ip.fov, 68, kk);
+      if (now % 200 < 20) hall.userData.drawKiosk(t);
+    }
     cam.updateProjectionMatrix();
 
     // board: float, inspect (explode), flip, then leave
@@ -360,18 +484,23 @@
     boardInner.position.y = Math.sin(t * .9) * .12;
     for (const q of parts) q.o.position.z = q.z + q.side * q.lift * insp;
     const leave = ease(range(p, .72, .8));
-    boardG.scale.setScalar(1 - leave * .999); halo.material.opacity = 1 - leave;
-    boardG.visible = leave < .99;
+    boardG.scale.setScalar(1 - leave * .999); halo.material.uniforms.a.value = .45 * (1 - leave);
+    boardG.visible = leave < .99 && !(intro && k < .7); halo.visible = boardG.visible;
 
     // finale: track + world fade, page shows through, nav comes in
     const fade = range(p, .88, .98);
     railMat.opacity = 1 - fade; railGlowMat.opacity = .25 * (1 - fade); tieMat.opacity = pillarMat.opacity = 1 - fade;
-    grid.material.opacity = 1 - fade; stars.material.opacity = .7 * (1 - fade);
+    grid.material.opacity = 1 - fade; hall.visible = p < .45;
+    { const cu = hall.userData.curtain, o = clamp((car.position.z + 11) / 7);   // dark until the car nears the exit
+      cu.material.opacity = o; cu.visible = o > .01; cu.material.depthWrite = o > .98; } stars.material.opacity = .7 * (1 - fade);
     scene.fog.density = .012 * (1 - fade);
+    if (intro) scene.fog.density = lerp(.004, .012, k);
     const carFade = range(p, .95, 1); car.scale.setScalar(lerp(1, 1.9, ease(range(p, .76, .8))) * (1 - carFade * .9));   // bigger in the wide side view
     cv.style.opacity = 1 - range(p, .88, .99);   // fade to the site with CSS instead of canvas alpha
     if (nav) nav.style.opacity = range(p, .9, .99);
     ui.style.opacity = 1 - range(p, .8, .9);
+    { const hn = ui.querySelector('.hint'); if (hn) hn.style.opacity = 1 - range(pRaw, .03, .08); }
+
     ui.style.pointerEvents = p > .85 ? 'none' : 'auto';
 
     if (p !== lastP || p < 1) renderer.render(scene, cam);

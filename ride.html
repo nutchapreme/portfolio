@@ -327,7 +327,7 @@ html {
 
 
 /* ── coaster intro ride ── */
-.ride-spacer{height:700vh;position:relative}
+.ride-spacer{height:715vh;position:relative}
 #rideCanvas{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:150;pointer-events:none}
 #rideUI{position:fixed;inset:0;z-index:210;pointer-events:none;font-family:'DM Mono',monospace}
 #rideUI .hint{position:absolute;left:0;right:0;bottom:34px;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#80c8ff;text-shadow:0 0 12px rgba(4,12,24,.9)}
@@ -393,6 +393,16 @@ html {
 .rm-close:hover{color:var(--ink)}
 .rm-frame{flex:1;width:100%;border:0;background:#fff}
 @media(max-width:600px){#resumeModal{padding:10px}.rm-box{height:88vh}.rm-btn.tab{display:none}}
+
+
+/* 3D board inside the project popup */
+.proj-model{position:relative;width:560px;max-width:100%;height:340px;flex-shrink:0;background:radial-gradient(ellipse at center,rgba(61,155,255,.14),transparent 70%);border:1px solid rgba(61,155,255,.15)}
+.proj-model canvas{width:100%!important;height:100%!important;display:block;cursor:grab;touch-action:none}
+.proj-model canvas:active{cursor:grabbing}
+.proj-model .pm-hint{position:absolute;left:14px;bottom:10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#4d6a90;pointer-events:none}
+.proj-model .pm-flip{position:absolute;right:12px;bottom:10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;color:#80c8ff;background:rgba(4,12,24,.6);border:1px solid rgba(61,155,255,.3);cursor:pointer}
+.proj-model .pm-flip:hover{background:rgba(61,155,255,.15)}
+@media(max-width:760px){.proj-model{width:100%;height:260px}}
 </style>
 </head>
 
@@ -432,7 +442,7 @@ html {
 <!-- coaster intro ride (js/ride.js) -->
 <div class="ride-spacer" id="ride" aria-hidden="true"></div>
 <canvas id="rideCanvas" aria-hidden="true"></canvas>
-<div id="rideUI"><div class="hint"><span>Scroll to ride</span><i></i></div><button id="rideSkip">Skip the ride ↓</button></div>
+<div id="rideUI"><div class="hint"><span>Move your mouse · Scroll to board</span><i></i></div><button id="rideSkip">Skip the ride ↓</button></div>
 
 <section class="hero" id="home">
   <canvas id="pleatCanvas" aria-hidden="true"></canvas>
@@ -1079,6 +1089,7 @@ const PROJECTS = [
     title: 'SharkFin <em>v.1.0</em>',
     tags: ['Altium Designer', 'STM32H743', 'OV5640', 'PCB Layout', 'Embedded Vision'],
     desc: 'A custom vision and tracking board built around the STM32H743VIH6 — a high-performance Cortex-M7 MCU. Features a 6-axis ICM-40609-D IMU for motion sensing, full power muxing between 5V LiPo and USB-C, triple LDO regulation (1.2V, 2.8V, 3.3V) for the camera and MCU rails, SD card logging, buzzer, SWD debug port, and a full peripheral breakout. Designed entirely in Altium Designer.',
+    model: 'img/sharkfin.glb',
     img: './SharkFin_front.png',
     imgBack: './SharkFin_back.png',
     imgSize: '460px',
@@ -1311,6 +1322,7 @@ const overlayHTML = `
         <img id="projImg" style="width:320px;display:none"/>
         <img id="projImgBack" style="width:320px;display:none"/>
       </div>
+      <div class="proj-model" id="projModel" style="display:none"><button class="pm-flip" type="button">Flip board ↻</button><span class="pm-hint">↖ Drag to rotate</span></div>
       <div class="proj-gallery" id="projGallery" style="display:none"></div>
     </div>
     <div id="projGalleryBelow" style="display:none;gap:10px;margin-bottom:48px;flex-wrap:wrap"></div>
@@ -1344,6 +1356,11 @@ document.querySelectorAll('.proj-card').forEach(card => {
     imgBackEl.style.width = p.imgSize || '320px';
     imgBackEl.style.display = p.imgBack ? 'block' : 'none';
 
+    // 3D model (replaces the flat front/back renders when the project has one)
+    const pmBox = document.getElementById('projModel');
+    if (p.model && window.ProjModel && window.ProjModel.show(pmBox, p.model)) {
+      pmBox.style.display = 'block'; imgEl.style.display = 'none'; imgBackEl.style.display = 'none';
+    } else { pmBox.style.display = 'none'; window.ProjModel && window.ProjModel.hide(); }
     // photo gallery (used by projects with no PCB render)
     const galEl = document.getElementById('projGallery');
     const galBelow = document.getElementById('projGalleryBelow');
@@ -1378,6 +1395,7 @@ document.querySelectorAll('.proj-card').forEach(card => {
 
 // Back button
 projBack.addEventListener('click', () => {
+  window.ProjModel && window.ProjModel.hide();
   overlay.style.transform = 'translateX(100%)';
   document.body.style.overflow = '';
 });
@@ -1385,6 +1403,7 @@ projBack.addEventListener('click', () => {
 // ESC key to close
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    window.ProjModel && window.ProjModel.hide();
     overlay.style.transform = 'translateX(100%)';
     document.body.style.overflow = '';
   }
@@ -1820,6 +1839,43 @@ document.addEventListener('keydown', e => {
   g.addEventListener('mousedown',e=>{ if(e.target.tagName==='CANVAS') return; down=true; x0=e.clientX; s0=g.scrollLeft; g.classList.add('dragging'); });
   addEventListener('mousemove',e=>{ if(down) g.scrollLeft=s0-(e.clientX-x0); });
   addEventListener('mouseup',()=>{ down=false; g.classList.remove('dragging'); });
+})();
+</script>
+<script>
+// 3D board viewer for project popups (drag to rotate, Flip button, gentle auto-spin)
+window.ProjModel=(function(){
+  let st=null;
+  function build(box){
+    const T=window.THREE; if(!T||!T.GLTFLoader) return null;
+    const cv=document.createElement('canvas'); box.prepend(cv);
+    const r=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true}); r.setPixelRatio(Math.min(devicePixelRatio,2)); r.outputEncoding=T.sRGBEncoding;
+    const sc=new T.Scene(), cam=new T.PerspectiveCamera(32,1,.01,100); cam.position.set(0,0,6);
+    sc.add(new T.HemisphereLight(0xdcecff,0x0a1426,.9)); const k=new T.DirectionalLight(0xffffff,.9); k.position.set(2,3,5); sc.add(k);
+    const fl=new T.DirectionalLight(0x80c8ff,.5); fl.position.set(-3,-2,-4); sc.add(fl);
+    const g=new T.Group(); sc.add(g);
+    const s={r,sc,cam,g,rx:-.35,ry:.35,trx:-.35,try_:.35,down:false,run:false,url:null,box};
+    let lx=0,ly=0;
+    const dn=(x,y)=>{s.down=true;lx=x;ly=y;}, mv=(x,y)=>{if(!s.down)return;s.try_+=(x-lx)*.01;s.trx=Math.max(-1.2,Math.min(1.2,s.trx+(y-ly)*.01));lx=x;ly=y;};
+    cv.addEventListener('mousedown',e=>dn(e.clientX,e.clientY)); addEventListener('mousemove',e=>mv(e.clientX,e.clientY)); addEventListener('mouseup',()=>s.down=false);
+    cv.addEventListener('touchstart',e=>dn(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+    cv.addEventListener('touchmove',e=>{mv(e.touches[0].clientX,e.touches[0].clientY);e.preventDefault();},{passive:false});
+    cv.addEventListener('touchend',()=>s.down=false);
+    box.querySelector('.pm-flip').addEventListener('click',()=>{s.try_+=Math.PI;});
+    const loop=()=>{ if(!s.run) return; requestAnimationFrame(loop);
+      const w=box.clientWidth,h=box.clientHeight; if(cv.width!==Math.round(w*r.getPixelRatio())){r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+      if(!s.down) s.try_+=.003;
+      s.rx+=(s.trx-s.rx)*.12; s.ry+=(s.try_-s.ry)*.12; g.rotation.set(s.rx,s.ry,0); r.render(sc,cam); };
+    s.loop=loop; return s;
+  }
+  function show(box,url){
+    if(!st) st=build(box); if(!st) return false;
+    if(st.url!==url){ st.url=url; while(st.g.children.length) st.g.remove(st.g.children[0]);
+      new THREE.GLTFLoader().load(url,gl=>{ const m=gl.scene, b=new THREE.Box3().setFromObject(m), c=b.getCenter(new THREE.Vector3()), z=b.getSize(new THREE.Vector3());
+        const sc=3.4/Math.max(z.x,z.y); m.scale.setScalar(sc); m.position.set(-c.x*sc,-c.y*sc,-c.z*sc); st.g.add(m); }); }
+    st.trx=-.35; st.try_=.35; st.run=true; st.loop(); return true;
+  }
+  function hide(){ if(st) st.run=false; }
+  return {show,hide};
 })();
 </script>
 </body>
