@@ -2261,5 +2261,18 @@ window.ProjModel=(function(){
   cs.forEach(c=>c.addEventListener('click',()=>{ const on=!c.classList.contains('show'); cs.forEach(x=>x.classList.remove('show')); c.classList.toggle('show',on); }));
 })();
 </script>
+<script>
+// phones: swipe right (from the left side) to go back out of a project page
+(function(){ const ov=document.getElementById('projOverlay'), back=document.getElementById('projBack'); if(!ov||!back) return;
+  let x0=0,y0=0,dx=0,on=false;
+  ov.addEventListener('touchstart',e=>{ const t=e.touches[0]; if(e.target.closest('canvas,.proj-gallery,#projGalleryBelow')||t.clientX>innerWidth*.45){on=false;return;}
+    x0=t.clientX;y0=t.clientY;dx=0;on=true; ov.style.transition='none'; },{passive:true});
+  ov.addEventListener('touchmove',e=>{ if(!on) return; const t=e.touches[0]; dx=t.clientX-x0; const dy=t.clientY-y0;
+    if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>12){ on=false; ov.style.transition=''; ov.style.transform='translateX(0)'; return; }
+    if(dx>0) ov.style.transform=`translateX(${dx}px)`; },{passive:true});
+  ov.addEventListener('touchend',()=>{ if(!on) return; on=false; ov.style.transition='';
+    if(dx>innerWidth*.28) back.click(); else ov.style.transform='translateX(0)'; });
+})();
+</script>
 </body>
 </html>
