@@ -608,6 +608,22 @@ html.light .rm-btn{color:#1f56c9!important}
 html.light .proj-stack img{filter:drop-shadow(0 14px 22px rgba(30,60,140,.22))}
 html.light .proj-stack .ps-back{filter:drop-shadow(0 14px 22px rgba(30,60,140,.22)) brightness(.95)}
 @media(max-width:768px){.proj-stack{height:170px}.proj-stack img{max-height:135px}}
+
+/* ARC logo: dark glow behind so it reads on any background */
+.proj-stack.single::before{content:'';position:absolute;left:50%;top:50%;width:62%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(2,6,16,.92) 0%,rgba(2,6,16,.7) 45%,rgba(2,6,16,0) 72%);z-index:0}
+.proj-stack.single .ps-front{z-index:1;filter:drop-shadow(0 0 10px rgba(0,0,0,.8))!important}
+
+html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
+/* mobile resume viewer: pages fit the width, pinch / buttons to zoom (min = fit) */
+.rm-pages{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;background:#e9edf5;display:none;touch-action:pan-x pan-y}
+.rm-pages .rm-inner{transform-origin:0 0;padding:8px}
+.rm-pages canvas{display:block;width:100%;height:auto;margin:0 0 8px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.rm-zoom{display:none;gap:4px}
+.rm-zoom button{font-family:'DM Mono',monospace;width:30px;height:30px;border:1px solid rgba(61,155,255,.35);background:rgba(61,155,255,.08);color:inherit;cursor:pointer;font-size:15px;line-height:1}
+.rm-mobile .rm-pages{display:block}.rm-mobile .rm-frame{display:none}.rm-mobile .rm-zoom{display:flex}
+.rm-pages .rm-msg{padding:30px 16px;text-align:center;font-size:12px;color:#5a6478}
+
+@media(max-width:768px){.proj-stack img{max-width:62%}.proj-stack .ps-back{right:9%}.proj-stack .ps-front{left:9%}}
 </style>
 </head>
 
@@ -1052,11 +1068,13 @@ html.light .proj-stack .ps-back{filter:drop-shadow(0 14px 22px rgba(30,60,140,.2
       <span class="rm-title">Resume</span>
       <div class="rm-actions">
         <a class="rm-btn tab" href="resume.pdf" target="_blank" rel="noopener">Open in new tab ↗</a>
+        <span class="rm-zoom"><button type="button" data-z="-1" aria-label="Zoom out">−</button><button type="button" data-z="1" aria-label="Zoom in">+</button></span>
         <a class="rm-btn solid" href="resume.pdf" download="Preme_Malaviphusit_Resume.pdf">Download ↓</a>
         <button class="rm-close" type="button" aria-label="Close">×</button>
       </div>
     </div>
     <iframe class="rm-frame" title="Resume preview"></iframe>
+    <div class="rm-pages"><div class="rm-inner"></div></div>
   </div>
 </div>
 
@@ -2079,7 +2097,7 @@ window.ProjModel=(function(){
     const cv=document.createElement('canvas'); box.prepend(cv);
     const r=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true}); r.setPixelRatio(Math.min(devicePixelRatio,2)); r.outputEncoding=T.sRGBEncoding;
     const sc=new T.Scene(), cam=new T.PerspectiveCamera(32,1,.01,100); cam.position.set(0,0,6);
-    const hl=new T.HemisphereLight(0xdcecff,0x0a1426,.9); sc.add(hl); const k=new T.DirectionalLight(0xffffff,.9); k.position.set(2,3,5); sc.add(k);
+    const hl=new T.HemisphereLight(0xdcecff,0x0a1426,.9); sc.add(hl); sc.add(new T.AmbientLight(0xffffff,.35)); const k=new T.DirectionalLight(0xffffff,.9); k.position.set(2,3,5); sc.add(k);
     const fl=new T.DirectionalLight(0x80c8ff,.5); fl.position.set(-3,-2,-4); sc.add(fl);
     const pmTheme=()=>{const pk=document.documentElement.classList.contains('light'); hl.color.setHex(pk?0xe6efff:0xdcecff); hl.groundColor.setHex(pk?0x14244a:0x0a1426); k.color.setHex(pk?0xffffff:0xffffff); fl.color.setHex(pk?0x6f9cf2:0x80c8ff); fl.intensity=pk?.8:.5;};
     pmTheme(); new MutationObserver(pmTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
@@ -2101,6 +2119,7 @@ window.ProjModel=(function(){
     if(!st) st=build(box); if(!st) return false;
     if(st.url!==url){ st.url=url; while(st.g.children.length) st.g.remove(st.g.children[0]);
       new THREE.GLTFLoader().load(url,gl=>{ const m=gl.scene, b=new THREE.Box3().setFromObject(m), c=b.getCenter(new THREE.Vector3()), z=b.getSize(new THREE.Vector3());
+        m.traverse(o=>{ if(o.isMesh&&o.material){ const b=o.name.startsWith('BOARD'); o.material.metalness=b?.1:.2; o.material.roughness=b?.55:.5; } });   // metal=1 with no env map renders light parts black
         const sc=3.4/Math.max(z.x,z.y); m.scale.setScalar(sc); m.position.set(-c.x*sc,-c.y*sc,-c.z*sc); st.g.add(m); }); }
     st.trx=0; st.try_=0; st.rx=0; st.ry=0; st.run=true; st.loop(); return true;
   }
@@ -2153,6 +2172,42 @@ window.ProjModel=(function(){
   }
   const start=()=>{ if(!run&&root.classList.contains('light')){run=true;requestAnimationFrame(frame);} };
   start(); new MutationObserver(start).observe(root,{attributes:true,attributeFilter:['class']});
+})();
+</script>
+
+<script>
+// mobile resume: render pages with PDF.js so they fit the screen and can be zoomed (min zoom = fit width)
+(function(){
+  const m=document.getElementById('resumeModal'); if(!m) return;
+  const mobile=()=>matchMedia('(max-width:700px),(hover:none)').matches;
+  const box=m.querySelector('.rm-box'), pages=m.querySelector('.rm-pages'), inner=m.querySelector('.rm-inner');
+  let z=1, loaded=false, baseW=0;
+  const setZ=(nz,cx,cy)=>{ nz=Math.max(1,Math.min(4,nz)); const r=pages.getBoundingClientRect();
+    cx=cx==null?r.width/2:cx; cy=cy==null?r.height/2:cy;
+    const px=(pages.scrollLeft+cx)/z, py=(pages.scrollTop+cy)/z; z=nz; inner.style.width=(baseW*z)+'px';
+    pages.scrollLeft=px*z-cx; pages.scrollTop=py*z-cy; };
+  function load(){
+    if(loaded) return; loaded=true; inner.innerHTML='<p class="rm-msg">Loading resume…</p>';
+    const go=()=>{ const lib=window.pdfjsLib; lib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      lib.getDocument('resume.pdf').promise.then(async pdf=>{ inner.innerHTML=''; baseW=pages.clientWidth; inner.style.width=baseW+'px';
+        for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i), v0=pg.getViewport({scale:1});
+          const sc=(baseW*Math.min(devicePixelRatio||1,2)*3)/v0.width, vp=pg.getViewport({scale:sc});   // render sharp enough for 3x zoom
+          const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; inner.appendChild(c);
+          await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; } })
+      .catch(()=>{ inner.innerHTML='<p class="rm-msg">Couldn’t preview here — use Download.</p>'; }); };
+    if(window.pdfjsLib) go(); else { const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload=go; s.onerror=()=>{inner.innerHTML='<p class="rm-msg">Couldn’t preview here — use Download.</p>';}; document.head.appendChild(s); }
+  }
+  new MutationObserver(()=>{ if(m.classList.contains('open')){ const mob=mobile(); box.classList.toggle('rm-mobile',mob); if(mob){ load(); } } }).observe(m,{attributes:true,attributeFilter:['class']});
+  m.querySelectorAll('.rm-zoom button').forEach(b=>b.addEventListener('click',()=>setZ(z*(b.dataset.z>0?1.4:1/1.4))));
+  // pinch to zoom
+  let d0=0,z0=1;
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  pages.addEventListener('touchstart',e=>{ if(e.touches.length===2){ d0=dist(e.touches); z0=z; } },{passive:true});
+  pages.addEventListener('touchmove',e=>{ if(e.touches.length===2&&d0){ e.preventDefault(); const r=pages.getBoundingClientRect();
+    setZ(z0*dist(e.touches)/d0,(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,(e.touches[0].clientY+e.touches[1].clientY)/2-r.top); } },{passive:false});
+  pages.addEventListener('touchend',e=>{ if(e.touches.length<2) d0=0; });
+  // double-tap: toggle fit / 2x
+  let lt=0; pages.addEventListener('touchend',e=>{ const n=Date.now(); if(n-lt<300&&e.changedTouches.length===1){ const r=pages.getBoundingClientRect(),t=e.changedTouches[0]; setZ(z>1.05?1:2,t.clientX-r.left,t.clientY-r.top);} lt=n; });
 })();
 </script>
 </body>
