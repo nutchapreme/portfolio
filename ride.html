@@ -658,6 +658,15 @@ html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
 html{overflow-anchor:none}   /* stop the browser "jumping" the page when things above change size */
 
 html,body{touch-action:manipulation}   /* no accidental double-tap zoom on phones */
+
+.t-mob{display:none}@media(hover:none),(max-width:768px){.t-desk{display:none}.t-mob{display:inline}}
+/* simulation: one scrollable row like the projects */
+.td-grid{flex-wrap:nowrap!important;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:6px}
+.td-grid::-webkit-scrollbar{display:none}
+.td-card{scroll-snap-align:start;flex:0 0 min(520px,86vw)!important}
+.td-hint{text-align:right;margin:0 0 14px}
+/* bigger ARC logo */
+.proj-stack.single .ps-front{max-width:80%!important;max-height:185px!important}
 </style>
 </head>
 
@@ -812,7 +821,7 @@ html,body{touch-action:manipulation}   /* no accidental double-tap zoom on phone
 <section id="projects" class="projects-section">
   <div class="proj-header reveal">
     <div class="sec-label" style="margin-bottom:0">Project</div>
-    <div class="drag-hint"><span class="drag-arr">←</span> Drag to explore</div>
+    <div class="drag-hint"><span class="drag-arr">←</span> <span class="t-desk">Scroll to explore</span><span class="t-mob">Drag to explore</span></div>
   </div>
   <div class="proj-track" id="projTrack">
     <div class="proj-card" data-id="0">
@@ -921,11 +930,10 @@ html,body{touch-action:manipulation}   /* no accidental double-tap zoom on phone
         <div class="poster-card"><img src="social_mixer.png" alt="Social Mixer"/><div class="poster-overlay"><div class="poster-overlay-title">Social Mixer — NYU × Columbia</div><div class="poster-overlay-desc">Illustrated poster for a collaborative SWE social mixer</div></div></div>
         <div class="poster-card"><img src="swe_gbm.png" alt="Welcome Freshmen Alt"/><div class="poster-overlay"><div class="poster-overlay-title">SWE First General Body Meeting</div><div class="poster-overlay-desc">Event flyer for the SWE First General Body Meeting</div></div></div>
         <div class="poster-card"><img src="4.png" alt="All-Uni TSA"/><div class="poster-overlay"><div class="poster-overlay-title">All-Uni TSA Group Chat</div><div class="poster-overlay-desc">Promotional graphic for the All-University Thai Student Association group chat campaign</div></div></div>
-        <div class="poster-card"><img src="5.png" alt="Welcome Freshmen"/><div class="poster-overlay"><div class="poster-overlay-title">Welcome Freshmen</div><div class="poster-overlay-desc">Incoming freshmen welcome poster for NYU TSA with Thai temple skyline motif</div></div></div>
-        <div class="poster-card"><img src="6.png" alt="Welcome Freshmen Alt"/><div class="poster-overlay"><div class="poster-overlay-title">Welcome Freshmen (Alt)</div><div class="poster-overlay-desc">Alternate warm colorway of the TSA freshmen welcome poster</div></div></div>
+        <div class="poster-card"><img src="6.png" alt="Welcome Freshmen"/><div class="poster-overlay"><div class="poster-overlay-title">Welcome Freshmen</div><div class="poster-overlay-desc">Incoming freshmen welcome poster for NYU TSA with Thai temple skyline motif</div></div></div>
         <div style="flex-shrink:0;width:52px"></div>
       </div>
-      <p class="drag-sub">← Drag to explore</p>
+      <p class="drag-sub">← <span class="t-desk">Scroll to explore</span><span class="t-mob">Drag to explore</span></p>
     </div>
   </div>
 
@@ -979,6 +987,7 @@ html,body{touch-action:manipulation}   /* no accidental double-tap zoom on phone
     <div class="td-intro reveal">
       <p class="td-eyebrow">// Simulation</p>
     </div>
+    <p class="drag-sub td-hint reveal"><span class="t-desk">Scroll to explore</span><span class="t-mob">Drag to explore</span> →</p>
     <div class="td-grid reveal">
       <div class="td-card">
         <div class="td-video-wrap">
@@ -2161,6 +2170,7 @@ document.addEventListener('keydown', e => {
   };
   // u where the car parks in front of the board (z ≈ -138 on the straight)
   let uStop = 0; for (let i = 0; i <= N; i++) { if (pts[i].z <= -137) { uStop = i / N; break; } }
+  let uFirst = 0; for (let i = 0; i <= N; i++) { if (pts[i].z <= -64) { uFirst = i / N; break; } }   // bottom of the first drop
   let uDrop = 0; for (let i = 0; i <= N; i++) { if (pts[i].x >= 44 && pts[i].y < -8) { uDrop = i / N; break; } }
 
   const trackGroup = new T.Group(); scene.add(trackGroup);
@@ -2575,7 +2585,8 @@ document.addEventListener('keydown', e => {
 
     // car progress along the track
     let u;
-    if (p < .25) u = lerp(0, uStop * .93, range(p, 0, .25));
+    if (p < .25) { const s = range(p, 0, .25), sp = .72;   // launch + lift + first drop keep their pace; the run after the drop is quicker
+      u = s < sp ? lerp(0, uFirst, s / sp) : lerp(uFirst, uStop * .93, (s - sp) / (1 - sp)); }
     else if (p < .36) u = lerp(uStop * .93, uStop, ease(range(p, .25, .36)));
     else if (p < .74) u = uStop;
     else if (p < .86) u = lerp(uStop, uDrop, ease(range(p, .74, .86)));
@@ -2824,6 +2835,20 @@ window.ProjModel=(function(){
   pages.addEventListener('touchmove',e=>{ if(e.touches.length===2&&d0){ e.preventDefault(); const r=pages.getBoundingClientRect();
     setZ(z0*dist(e.touches)/d0,(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,(e.touches[0].clientY+e.touches[1].clientY)/2-r.top); } },{passive:false});
   pages.addEventListener('touchend',e=>{ if(e.touches.length<2) d0=0; });
+})();
+</script>
+<script>
+// desktop: mouse wheel scrolls these rows sideways (then hands back to the page at the ends)
+(function(){
+  if(matchMedia('(hover:none)').matches) return;
+  ['projTrack','posterTrack'].map(id=>document.getElementById(id)).concat([...document.querySelectorAll('.td-grid')]).forEach(el=>{
+    if(!el) return;
+    el.addEventListener('wheel',e=>{ if(Math.abs(e.deltaX)>Math.abs(e.deltaY)) return;
+      const max=el.scrollWidth-el.clientWidth; if(max<=0) return;
+      const next=el.scrollLeft+e.deltaY; if((e.deltaY<0&&el.scrollLeft<=0)||(e.deltaY>0&&el.scrollLeft>=max-1)) return;
+      e.preventDefault(); el.style.scrollSnapType='none'; el.scrollLeft=Math.max(0,Math.min(max,next));
+      clearTimeout(el._snapT); el._snapT=setTimeout(()=>{el.style.scrollSnapType='';},180); },{passive:false});
+  });
 })();
 </script>
 </body>
