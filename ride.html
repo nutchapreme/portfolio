@@ -656,7 +656,7 @@ html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
 
 @media(max-width:768px){.proj-stack img{max-width:62%}.proj-stack .ps-back{right:9%}.proj-stack .ps-front{left:9%}}
 
-html{overflow-anchor:none}   /* stop the browser "jumping" the page when things above change size */
+html,body{overflow-anchor:none}   /* stop the browser "jumping" the page when things above change size */
 
 html,body{touch-action:manipulation}   /* no accidental double-tap zoom on phones */
 
@@ -2702,12 +2702,12 @@ document.addEventListener('keydown', e => {
     const y = scrollY - h; folded = true; running = false; window.__rideCover = false;
     spacer.style.display = 'none'; cv.style.visibility = 'hidden'; ui.style.display = 'none';
     const rb = document.getElementById('rideRestart'); if (rb) rb.style.display = 'none';
-    window.scrollTo({ top: Math.max(0, y), behavior: 'instant' }); }
+    jumpTo(Math.max(0, y)); }
   addEventListener('scroll', () => { clearTimeout(foldT); foldT = setTimeout(fold, 150); }, { passive: true });
-  let holdUntil = 0;   // swallow leftover trackpad momentum right after jumping back to the start
-  addEventListener('wheel', e => { if (performance.now() < holdUntil) e.preventDefault(); }, { passive: false });
-  window.__rideReopen = () => { stopAuto(); holdUntil = performance.now() + 800; if (folded) { folded = false; spacer.style.display = ''; ui.style.display = ''; const rb = document.getElementById('rideRestart'); if (rb) rb.style.display = ''; lockSpacer(); }
-    window.scrollTo({ top: 0, behavior: 'instant' }); requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' })); lastP = -1; if (!running) { running = true; requestAnimationFrame(frameLoop); } };
+  // hard jump that ignores the page's smooth-scroll setting (some browsers treat behavior:'instant' as smooth)
+  const jumpTo = y => { const r = document.documentElement, o = r.style.scrollBehavior; r.style.scrollBehavior = 'auto'; document.body.style.scrollBehavior = 'auto'; (document.scrollingElement || r).scrollTop = y; window.scrollTo(0, y); r.style.scrollBehavior = o; document.body.style.scrollBehavior = ''; };
+  // ride-again: a clean reload from the very top is the most reliable reset (no half-restored scroll states)
+  window.__rideReopen = () => { stopAuto(); location.href = location.pathname + location.search; };
   document.getElementById('rideSkip').addEventListener('click', () => { stopAuto(); document.getElementById('home').scrollIntoView({ behavior: 'smooth' }); });
   // auto ride: glides through the whole ride on its own (~40s); any touch / wheel / key takes back control
   const autoBtn = document.getElementById('rideAuto'); let autoOn = false, aPrev = 0;
