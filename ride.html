@@ -331,7 +331,7 @@ html {
 
 
 /* ── coaster intro ride ── */
-.ride-spacer{height:520vh;position:relative}
+.ride-spacer{height:460vh;position:relative}
 .rcall{position:absolute;left:0;top:0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#cfe6ff;white-space:nowrap;opacity:0;padding:5px 10px;background:rgba(4,12,24,.78);border:1px solid rgba(61,155,255,.4);backdrop-filter:blur(6px);pointer-events:none;will-change:transform,opacity}
 .rcall em{font-style:normal;color:#80c8ff;margin-left:6px}
 .rcall::before{content:'';position:absolute;left:-5px;bottom:-14px;width:7px;height:7px;border-radius:50%;background:#3d9bff;box-shadow:0 0 10px #3d9bff}
@@ -641,7 +641,8 @@ html.light .proj-stack .ps-back{filter:drop-shadow(0 14px 22px rgba(30,60,140,.2
 html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
 /* mobile resume viewer: pages fit the width, pinch / buttons to zoom (min = fit) */
 .rm-pages{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;background:#e9edf5;display:none;touch-action:pan-x pan-y}
-.rm-pages .rm-inner{transform-origin:0 0;padding:8px}
+.rm-pages .rm-sizer{position:relative;margin:8px auto}
+.rm-pages .rm-inner{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 .rm-pages canvas{display:block;width:100%;height:auto;margin:0 0 8px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15)}
 .rm-zoom{display:none;gap:4px}
 .rm-zoom button{font-family:'DM Mono',monospace;width:30px;height:30px;border:1px solid rgba(61,155,255,.35);background:rgba(61,155,255,.08);color:inherit;cursor:pointer;font-size:15px;line-height:1}
@@ -655,6 +656,8 @@ html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
 @media(max-width:768px){.proj-stack img{max-width:62%}.proj-stack .ps-back{right:9%}.proj-stack .ps-front{left:9%}}
 
 html{overflow-anchor:none}   /* stop the browser "jumping" the page when things above change size */
+
+html,body{touch-action:manipulation}   /* no accidental double-tap zoom on phones */
 </style>
 </head>
 
@@ -2485,15 +2488,20 @@ document.addEventListener('keydown', e => {
   }, undefined, e => console.warn('[ride] board model failed, using flat render', e));
 
   /* ── component callouts (front-render pixel anchors → nearest top-side part) ── */
-  const CALLS = [['STM32H743', 'MCU', 668, 270], ['USB-C', 'Power + Data', 78, 130], ['Buzzer', '', 468, 210], ['SWD', 'Debug', 558, 45], ['Camera Port', 'OV5640', 1153, 310], ['PWM · UART · I²C', 'Breakout', 828, 500]];
-  const calls = CALLS.map(([a, b]) => { const el = document.createElement('div'); el.className = 'rcall'; el.innerHTML = a + '<em>' + b + '</em>'; ui.appendChild(el); return { el, part: null }; });
+  const CALLS = [['STM32H743', 'MCU', 668, 270], ['USB-C', '', 78, 130], ['Buzzer', '', 468, 210], ['SWD', '', 558, 45], ['Camera Port', 'OV5640', 1153, 310], ['PWM · UART · I²C', 'Breakout', 828, 500], ['SD Card Slot', '', null, null, 1]];
+  const calls = CALLS.map(([a, b, , , back]) => { const el = document.createElement('div'); el.className = 'rcall'; el.innerHTML = a + (b ? '<em>' + b + '</em>' : ''); ui.appendChild(el); return { el, part: null, back: !!back }; });
   let callsReady = false;
   function setupCalls() {
     callsReady = true; boardInner.updateMatrixWorld(true);
     const k = BW / 1166, info = parts.map(q => { const g = q.o.geometry; if (!g.boundingBox) g.computeBoundingBox();
-      const v = g.boundingBox.getCenter(new T.Vector3()).applyMatrix4(q.o.matrixWorld); boardInner.worldToLocal(v); return { q, v }; });
-    CALLS.forEach(([, , px, py], i) => { const ax = (px - 609) * k, ay = -(py - 274) * k; let best = null, bd = 1e9;
-      for (const it of info) { if (it.v.z <= 0) continue; const d = Math.hypot(it.v.x - ax, it.v.y - ay); if (d < bd) { bd = d; best = it.q; } }
+      const bb = g.boundingBox.clone().applyMatrix4(q.o.matrixWorld), lo = boardInner.worldToLocal(bb.min.clone()), hi = boardInner.worldToLocal(bb.max.clone());
+      const v = lo.clone().add(hi).multiplyScalar(.5), area = Math.abs((hi.x - lo.x) * (hi.y - lo.y)); return { q, v, area }; });
+    CALLS.forEach(([, , px, py, back], i) => {
+      if (back) { let best = null, ba = 0; for (const it of info) if (it.v.z < 0 && it.area > ba) { ba = it.area; best = it.q; } calls[i].part = best; return; }
+      const ax = (px - 609) * k, ay = -(py - 274) * k; let best = null, score = 1e9;
+      for (const it of info) { if (it.v.z <= 0) continue; const d = Math.hypot(it.v.x - ax, it.v.y - ay);
+        const s = d - Math.sqrt(it.area) * .8;                 // prefer the big part near the anchor, not a tiny pin beside it
+        if (d < .9 && s < score) { score = s; best = it.q; } }
       calls[i].part = best; });
   }
 
@@ -2547,12 +2555,12 @@ document.addEventListener('keydown', e => {
     pos.set(clamp(pos.x, -5.2, 5.2), clamp(pos.y, .3, 5.8), Math.min(pos.z, 63));   // stay inside the hall
     return { pos, look: target.clone(), fov };
   }
-  const P0 = .09;   // share of the scroll used by the boarding intro (short)
-  const WQ = [0, .085, .175, .375, 1], WP = [0, .25, .42, .69, 1];   // quick track run + quick board section, unhurried finale
+  const P0 = .1;   // share of the scroll used by the boarding intro (short)
+  const WQ = [0, .14, .25, .47, 1], WP = [0, .25, .42, .69, 1];   // quick track run + quick board section, unhurried finale
   const warp = q => { for (let i = 1; i < WQ.length; i++) if (q <= WQ[i]) return WP[i - 1] + (q - WQ[i - 1]) / (WQ[i] - WQ[i - 1]) * (WP[i] - WP[i - 1]); return 1; };
 
   /* ── scroll → timeline ── */
-  let lockH = 0; const lockSpacer = () => { if (noHoverS) { lockH = Math.round(innerHeight * 5.2); spacer.style.height = lockH + 'px'; } };
+  let lockH = 0; const lockSpacer = () => { if (noHoverS) { lockH = Math.round(innerHeight * 4.6); spacer.style.height = lockH + 'px'; } };
   lockSpacer(); let lw = innerWidth; addEventListener('resize', () => { if (innerWidth !== lw) { lw = innerWidth; lockSpacer(); } });
   function progress() { const h = spacer.offsetHeight; return clamp(scrollY / h); }
   let running = true, lastP = -1;
@@ -2610,13 +2618,13 @@ document.addEventListener('keydown', e => {
     boardInner.position.y = Math.sin(t * .9) * .12;
     for (const q of parts) q.o.position.z = q.z + q.side * q.lift * insp;
     // component labels follow their parts while exploded
-    { const lo = clamp(insp * 1.6 - .35) * (1 - flip);
-      if (lo > 0 && parts.length && !callsReady) setupCalls();
-      for (const cl of calls) { if (!cl.part || lo <= 0) { cl.el.style.opacity = 0; continue; }
+    { const lo = clamp(insp * 1.6 - .35) * (1 - flip), lb = clamp(range(p, .585, .615)) * (1 - range(p, .67, .7));
+      if ((lo > 0 || lb > 0) && parts.length && !callsReady) setupCalls();
+      for (const cl of calls) { const o = cl.back ? lb : lo; if (!cl.part || o <= 0) { cl.el.style.opacity = 0; continue; }
         const g = cl.part.o.geometry; if (!g.boundingBox) g.computeBoundingBox();
-        tmp.copy(g.boundingBox.getCenter(tmp2)); tmp.z = g.boundingBox.max.z; tmp.applyMatrix4(cl.part.o.matrixWorld).project(cam);
-        const sx = (tmp.x * .5 + .5) * W, sy = (-tmp.y * .5 + .5) * H, lw = cl.el.offsetWidth || 150;
-        cl.el.style.opacity = lo; cl.el.style.transform = `translate(${Math.min(sx + 6, W - lw - 10)}px,${Math.max(10, sy - 30)}px)`; } }
+        tmp.copy(g.boundingBox.getCenter(tmp2)); tmp.applyMatrix4(cl.part.o.matrixWorld).project(cam);
+        const sx = (tmp.x * .5 + .5) * W, sy = (-tmp.y * .5 + .5) * H, lw = cl.el.offsetWidth || 150, lh = cl.el.offsetHeight || 24;
+        cl.el.style.opacity = o; cl.el.style.transform = `translate(${Math.min(sx + 4, W - lw - 10)}px,${Math.max(10, sy - lh - 12)}px)`; } }
     const leave = ease(range(p, .72, .8));
     boardG.scale.setScalar(1 - leave * .999); halo.material.uniforms.a.value = .45 * (1 - leave);
     boardG.visible = leave < .99 && !(intro && k < .7); halo.visible = boardG.visible;
@@ -2696,7 +2704,7 @@ window.ProjModel=(function(){
     const cv=document.createElement('canvas'); box.prepend(cv);
     const r=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true}); r.setPixelRatio(Math.min(devicePixelRatio,2)); r.outputEncoding=T.sRGBEncoding;
     const sc=new T.Scene(), cam=new T.PerspectiveCamera(32,1,.01,100); cam.position.set(0,0,6);
-    const hl=new T.HemisphereLight(0xdcecff,0x0a1426,.9); sc.add(hl); sc.add(new T.AmbientLight(0xffffff,.35)); const k=new T.DirectionalLight(0xffffff,.9); k.position.set(2,3,5); sc.add(k);
+    const hl=new T.HemisphereLight(0xdcecff,0x0a1426,.7); sc.add(hl); sc.add(new T.AmbientLight(0xffffff,.12)); const k=new T.DirectionalLight(0xffffff,.75); k.position.set(2,3,5); sc.add(k);
     const fl=new T.DirectionalLight(0x80c8ff,.5); fl.position.set(-3,-2,-4); sc.add(fl);
     const pmTheme=()=>{const pk=document.documentElement.classList.contains('light'); hl.color.setHex(pk?0xe6efff:0xdcecff); hl.groundColor.setHex(pk?0x14244a:0x0a1426); k.color.setHex(pk?0xffffff:0xffffff); fl.color.setHex(pk?0x6f9cf2:0x80c8ff); fl.intensity=pk?.8:.5;};
     pmTheme(); new MutationObserver(pmTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
@@ -2775,38 +2783,40 @@ window.ProjModel=(function(){
 </script>
 
 <script>
-// mobile resume: render pages with PDF.js so they fit the screen and can be zoomed (min zoom = fit width)
+// mobile resume: PDF.js pages; opens showing the whole page; pinch / buttons / double-tap zoom (min = whole page). Zoom is a GPU transform so it stays smooth.
 (function(){
   const m=document.getElementById('resumeModal'); if(!m) return;
   const mobile=()=>matchMedia('(max-width:700px),(hover:none)').matches;
   const box=m.querySelector('.rm-box'), pages=m.querySelector('.rm-pages'), inner=m.querySelector('.rm-inner');
-  let z=1, loaded=false, baseW=0;
-  const setZ=(nz,cx,cy)=>{ nz=Math.max(1,Math.min(4,nz)); const r=pages.getBoundingClientRect();
-    cx=cx==null?r.width/2:cx; cy=cy==null?r.height/2:cy;
-    const px=(pages.scrollLeft+cx)/z, py=(pages.scrollTop+cy)/z; z=nz; inner.style.width=(baseW*z)+'px';
+  const sizer=document.createElement('div'); sizer.className='rm-sizer'; pages.insertBefore(sizer,inner); sizer.appendChild(inner);
+  let z=1, loaded=false, baseW=0, cH=0, raf=0, want=null;
+  const apply=()=>{ raf=0; if(!want) return; let [nz,cx,cy]=want; want=null;
+    const px=(pages.scrollLeft+cx)/z, py=(pages.scrollTop+cy)/z; z=nz;
+    inner.style.transform=`scale(${z})`; sizer.style.width=baseW*z+'px'; sizer.style.height=cH*z+'px';
     pages.scrollLeft=px*z-cx; pages.scrollTop=py*z-cy; };
+  const setZ=(nz,cx,cy)=>{ const r=pages.getBoundingClientRect(); want=[Math.max(1,Math.min(5,nz)),cx==null?r.width/2:cx,cy==null?r.height/2:cy]; if(!raf) raf=requestAnimationFrame(apply); };
+  const fail=()=>{ inner.innerHTML='<p class="rm-msg">Couldn’t preview here — use Download.</p>'; };
   function load(){
     if(loaded) return; loaded=true; inner.innerHTML='<p class="rm-msg">Loading resume…</p>';
     const go=()=>{ const lib=window.pdfjsLib; lib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      lib.getDocument('resume.pdf').promise.then(async pdf=>{ inner.innerHTML=''; baseW=pages.clientWidth; inner.style.width=baseW+'px';
-        for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i), v0=pg.getViewport({scale:1});
-          const sc=(baseW*Math.min(devicePixelRatio||1,2)*3)/v0.width, vp=pg.getViewport({scale:sc});   // render sharp enough for 3x zoom
+      lib.getDocument('resume.pdf').promise.then(async pdf=>{ inner.innerHTML='';
+        const p1=await pdf.getPage(1), v1=p1.getViewport({scale:1}), pad=16;
+        baseW=Math.floor(Math.min(pages.clientWidth-pad,(pages.clientHeight-pad)*v1.width/v1.height));   // whole first page visible
+        inner.style.width=baseW+'px';
+        for(let i=1;i<=pdf.numPages;i++){ const pg=i===1?p1:await pdf.getPage(i), v0=pg.getViewport({scale:1});
+          const sc=Math.min(2600/v0.width,(baseW*Math.min(devicePixelRatio||1,2)*2.5)/v0.width), vp=pg.getViewport({scale:sc});
           const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; inner.appendChild(c);
-          await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; } })
-      .catch(()=>{ inner.innerHTML='<p class="rm-msg">Couldn’t preview here — use Download.</p>'; }); };
-    if(window.pdfjsLib) go(); else { const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload=go; s.onerror=()=>{inner.innerHTML='<p class="rm-msg">Couldn’t preview here — use Download.</p>';}; document.head.appendChild(s); }
+          await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; }
+        cH=inner.offsetHeight; z=1; inner.style.transform='scale(1)'; sizer.style.width=baseW+'px'; sizer.style.height=cH+'px'; }).catch(fail); };
+    if(window.pdfjsLib) go(); else { const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload=go; s.onerror=fail; document.head.appendChild(s); }
   }
-  new MutationObserver(()=>{ if(m.classList.contains('open')){ const mob=mobile(); box.classList.toggle('rm-mobile',mob); if(mob){ load(); } } }).observe(m,{attributes:true,attributeFilter:['class']});
-  m.querySelectorAll('.rm-zoom button').forEach(b=>b.addEventListener('click',()=>setZ(z*(b.dataset.z>0?1.4:1/1.4))));
-  // pinch to zoom
-  let d0=0,z0=1;
-  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  new MutationObserver(()=>{ if(m.classList.contains('open')){ const mob=mobile(); box.classList.toggle('rm-mobile',mob); if(mob) load(); } }).observe(m,{attributes:true,attributeFilter:['class']});
+  m.querySelectorAll('.rm-zoom button').forEach(b=>b.addEventListener('click',()=>setZ(z*(b.dataset.z>0?1.5:1/1.5))));
+  let d0=0,z0=1; const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
   pages.addEventListener('touchstart',e=>{ if(e.touches.length===2){ d0=dist(e.touches); z0=z; } },{passive:true});
   pages.addEventListener('touchmove',e=>{ if(e.touches.length===2&&d0){ e.preventDefault(); const r=pages.getBoundingClientRect();
     setZ(z0*dist(e.touches)/d0,(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,(e.touches[0].clientY+e.touches[1].clientY)/2-r.top); } },{passive:false});
   pages.addEventListener('touchend',e=>{ if(e.touches.length<2) d0=0; });
-  // double-tap: toggle fit / 2x
-  let lt=0; pages.addEventListener('touchend',e=>{ const n=Date.now(); if(n-lt<300&&e.changedTouches.length===1){ const r=pages.getBoundingClientRect(),t=e.changedTouches[0]; setZ(z>1.05?1:2,t.clientX-r.left,t.clientY-r.top);} lt=n; });
 })();
 </script>
 </body>
