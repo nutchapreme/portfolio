@@ -613,7 +613,7 @@ html.light .proj-stack .ps-back{filter:drop-shadow(0 14px 22px rgba(30,60,140,.2
 
 /* ARC logo: dark glow behind so it reads on any background */
 .proj-stack.single::before{content:none}
-.proj-stack.single .ps-front{z-index:1;filter:drop-shadow(0 0 1.5px rgba(2,8,24,.9)) drop-shadow(0 0 8px rgba(61,155,255,.85)) drop-shadow(0 0 22px rgba(61,155,255,.55))!important}
+.proj-stack.single .ps-front{z-index:1;filter:drop-shadow(0 0 1.5px rgba(2,8,24,.9)) drop-shadow(0 0 16px rgba(61,155,255,.7)) drop-shadow(0 0 38px rgba(61,155,255,.45))!important}
 
 html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
 /* mobile resume viewer: pages fit the width, pinch / buttons to zoom (min = fit) */
@@ -639,7 +639,18 @@ html,body{touch-action:manipulation}   /* no accidental double-tap zoom on phone
 .td-card{scroll-snap-align:start;flex:0 0 min(520px,86vw)!important}
 .td-hint{text-align:right;margin:0 0 14px}
 /* bigger ARC logo */
-.proj-stack.single .ps-front{max-width:80%!important;max-height:185px!important}
+.proj-stack.single{height:230px}.proj-stack.single .ps-front{max-width:96%!important;max-height:220px!important}
+
+.proj-model .pm-flip{background:rgba(61,155,255,.18)!important;border-color:rgba(128,200,255,.6)!important;color:#dff0ff!important}
+.proj-model .pm-flip:hover{background:rgba(61,155,255,.32)!important}
+html.light .proj-model .pm-flip{background:#fff!important;color:#1f56c9!important;border-color:rgba(47,111,232,.45)!important;box-shadow:0 4px 14px rgba(30,70,170,.15)}
+html.light .proj-model .pm-flip:hover{background:#eef3ff!important}
+html.light .proj-model .pm-hint{color:#5a6478}
+
+/* phones */
+@media(max-width:900px){.cad-grid{overflow:visible!important}.cad-card{flex:none!important;width:100%!important;min-width:0;height:auto!important}.cad-canvas-wrap{height:240px}}
+@media(hover:none),(max-width:768px){.cad-hint,.proj-model .pm-hint{display:none!important}}
+@media(hover:none){.art-circle:hover .art-overlay{opacity:0}.art-circle:hover{transform:none}.art-circle.show .art-overlay{opacity:1}}
 </style>
 </head>
 
@@ -2241,6 +2252,13 @@ window.ProjModel=(function(){
       e.preventDefault(); el.style.scrollSnapType='none'; el.scrollLeft=Math.max(0,Math.min(max,next));
       clearTimeout(el._snapT); el._snapT=setTimeout(()=>{el.style.scrollSnapType='';},180); },{passive:false});
   });
+})();
+</script>
+<script>
+// phones: tap a logo circle to show its description, tap again (or another) to hide
+(function(){ if(!matchMedia('(hover:none)').matches) return;
+  const cs=[...document.querySelectorAll('.art-circle')];
+  cs.forEach(c=>c.addEventListener('click',()=>{ const on=!c.classList.contains('show'); cs.forEach(x=>x.classList.remove('show')); c.classList.toggle('show',on); }));
 })();
 </script>
 </body>
