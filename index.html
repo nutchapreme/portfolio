@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>try{localStorage.removeItem("theme");if(sessionStorage.getItem("theme")==="light")document.documentElement.classList.add("light")}catch(e){}</script>
+
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Preme Malaviphusit</title>
@@ -78,7 +80,7 @@ nav.scrolled{border-color:var(--line)}
 
 .marquee-wrap{position:relative;z-index:1;overflow:hidden;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(61,155,255,.025)}
 .marquee-track{display:flex;white-space:nowrap;animation:marquee 24s linear infinite}
-.marquee-track:hover{animation-play-state:paused}
+
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .m-item{font-family:'Fraunces',serif;font-size:13px;font-weight:300;font-style:italic;color:var(--muted);padding:0 24px;display:inline-flex;align-items:center;gap:24px}
 .m-item.hi{color:var(--accent2)}
@@ -391,6 +393,206 @@ html {
 .proj-model .pm-flip{position:absolute;right:12px;bottom:10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;color:#80c8ff;background:rgba(4,12,24,.6);border:1px solid rgba(61,155,255,.3);cursor:pointer}
 .proj-model .pm-flip:hover{background:rgba(61,155,255,.15)}
 @media(max-width:760px){.proj-model{width:100%;height:260px}}
+
+/* ── LIGHT MODE ── */
+.theme-toggle{position:relative;width:66px;height:30px;border-radius:30px;border:1px solid rgba(61,155,255,.45);background:linear-gradient(90deg,#1f5fd6,#3d9bff);cursor:pointer;padding:0;flex-shrink:0;box-shadow:0 0 18px rgba(61,155,255,.3);margin-left:24px}
+.theme-toggle .tt-ico{position:absolute;top:50%;width:22px;height:22px;margin-top:-11px;display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+.theme-toggle .tt-moon{left:4px}.theme-toggle .tt-sun{right:4px}
+.theme-toggle svg{width:13px;height:13px}
+.theme-toggle .tt-knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#061633;box-shadow:0 1px 4px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.22,1,.36,1),background .35s}
+.theme-toggle .tt-moon{z-index:1;color:#cfe6ff}.theme-toggle .tt-sun{z-index:1;color:#fff}
+html.light .theme-toggle .tt-knob{transform:translateX(36px);background:#fff}
+html.light .theme-toggle .tt-sun{color:#f2a900}
+html.light .theme-toggle .tt-moon{color:#e8f2ff}
+nav{justify-content:flex-start!important}
+.nav-links{margin-left:auto}
+@media(max-width:768px){.theme-toggle{margin-left:auto;margin-right:14px}}
+
+html.light{--bg:#eef4fb;--ink:#0b1a30;--muted:#55708f;--accent:#1f6fe0;--accent2:#1d63c9;--line:rgba(31,111,224,.16);--card:#ffffff;color-scheme:light}
+html.light body{background:var(--bg)}
+html.light nav{background:linear-gradient(90deg,rgba(255,255,255,.94),rgba(244,247,255,.94))!important;border-bottom:1px solid rgba(47,111,232,.25)!important}
+html.light .nav-links a{color:#1e2a44}html.light .nav-links a:hover{color:#1f56c9}
+html.light #mobileMenu{background:rgba(244,247,255,.98)!important}
+html.light .mob-link{color:#1e2a44}html.light .bar{background:#1e2a44}
+html.light .hero::after{background:linear-gradient(180deg,rgba(238,244,251,.55) 0%,transparent 25%,transparent 80%,var(--bg) 100%),linear-gradient(90deg,rgba(238,244,251,.35) 0%,transparent 50%)}
+html.light #conCanvas{filter:invert(1) sepia(1) saturate(5) hue-rotate(178deg) brightness(.85);opacity:.75}
+html.light .contact-section{background:linear-gradient(180deg,var(--bg) 0%,#e3edf9 100%)}
+html.light .proj-card{box-shadow:0 10px 30px rgba(20,60,120,.06)}
+html.light .art-overlay{background:radial-gradient(circle at center,rgba(238,244,251,.92) 30%,rgba(238,244,251,.7) 100%)}
+html.light .art-overlay-desc,html.light .poster-overlay-desc{color:var(--ink)}
+html.light .poster-overlay{background:linear-gradient(to top,rgba(238,244,251,.95) 0%,rgba(238,244,251,.4) 50%,transparent 100%)}
+html.light .overlay{background:var(--bg)}
+html.light .ov-hl{background:#fff}
+html.light .ov-hlt strong{color:var(--ink)}
+/* project popup (styled inline by script) */
+html.light #projOverlay{background:var(--bg)!important;color:var(--ink)}
+html.light #projOverlay .proj-nav-bar{background:rgba(238,244,251,.9)!important}
+html.light #projOverlay #projHL>div{background:#fff!important}
+html.light #projOverlay #projHL p strong{color:var(--ink)}
+html.light #projOverlay #projDesc{color:#3f5a7a!important}
+html.light #projOverlay [style*="color:#ffffff"]{color:var(--accent)!important;border-color:var(--line)!important}
+/* holograms + CAD viewers stay on dark "screens" so the glow still reads */
+html.light .holo-stage{background:radial-gradient(ellipse at 50% 40%,#0c2147,#050e20 75%);border-radius:18px;padding:18px 0 6px;box-shadow:0 20px 50px rgba(20,60,120,.18)}
+html.light .holo-stage .tool-chip{color:#80c8ff}
+html.light .holo-name{color:#6c8bb3}
+html.light .holo.on .holo-name,html.light .holo:hover .holo-name{color:#80c8ff}
+html.light .cad-card,html.light .td-card{box-shadow:0 10px 30px rgba(20,60,120,.06)}
+html.light .tools-chips .tool-chip{background:#fff}
+html.light .rm-box{background:#fff}
+html.light #resumeModal{background:rgba(220,232,247,.75)}
+html.light footer p{color:var(--muted)}
+
+/* generated pink overrides */
+html.light :root{--ink:#0b1220!important;--muted:#5a6478!important;--accent:#2f6fe8!important;--accent2:#1f56c9!important;--line:rgba(47,111,232,.12)!important}
+html.light #cur{box-shadow:0 0 14px var(--accent),0 0 28px rgba(47,111,232,.35)!important}
+html.light #cur.hov{box-shadow:0 0 24px rgba(47,111,232,.4)!important}
+html.light .orb1{background:radial-gradient(circle,rgba(47,111,232,.11) 0%,transparent 70%)!important}
+html.light .orb2{background:radial-gradient(circle,rgba(90,140,240,.07) 0%,transparent 70%)!important}
+html.light .hero-grid{background-image:linear-gradient(rgba(47,111,232,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(47,111,232,.03) 1px,transparent 1px)!important}
+html.light .btn-solid{box-shadow:0 0 28px rgba(47,111,232,.35)!important}
+html.light .btn-solid:hover{box-shadow:0 0 40px rgba(47,111,232,.55)!important}
+html.light .hero-astronaut::after{background:radial-gradient(ellipse,rgba(47,111,232,.35) 0%,transparent 70%)!important}
+html.light .marquee-wrap{background:rgba(47,111,232,.025)!important}
+html.light .sec-label::before{color:rgba(47,111,232,.4)!important}
+html.light .proj-card::after{background:linear-gradient(135deg,rgba(47,111,232,.06) 0%,transparent 50%)!important}
+html.light .proj-card:hover{border-color:rgba(47,111,232,.3)!important}
+html.light .proj-num{color:rgba(47,111,232,.05)!important}
+html.light .proj-tag{border:1px solid rgba(47,111,232,.2)!important;background:rgba(47,111,232,.05)!important}
+html.light .art-tab.active,html.light .art-tab:hover{background:rgba(47,111,232,.08)!important;border-color:rgba(47,111,232,.3)!important}
+html.light .art-circle:hover{box-shadow:0 0 0 4px rgba(47,111,232,.2),0 0 40px rgba(47,111,232,.2)!important;border-color:rgba(47,111,232,.5)!important}
+html.light .poster-card:hover{border-color:rgba(47,111,232,.35)!important;box-shadow:0 20px 60px rgba(47,111,232,.12)!important}
+html.light /* CAD */
+.cad-grid{scrollbar-color:rgba(47,111,232,.2) transparent!important}
+html.light .cad-grid::-webkit-scrollbar-thumb{background:rgba(47,111,232,.2)!important}
+html.light .cad-card:hover{border-color:rgba(47,111,232,.35)!important;box-shadow:0 0 40px rgba(47,111,232,.08)!important}
+html.light .cad-badge{border:1px solid rgba(47,111,232,.25)!important;background:rgba(47,111,232,.05)!important}
+html.light .td-card:hover{border-color:rgba(47,111,232,.35)!important;box-shadow:0 0 40px rgba(47,111,232,.08)!important}
+html.light .td-badge{border:1px solid rgba(47,111,232,.25)!important;background:rgba(47,111,232,.05)!important}
+html.light .contact-card::before{background:linear-gradient(90deg,rgba(47,111,232,.05) 0%,transparent 60%)!important}
+html.light .contact-card:hover{border-color:rgba(47,111,232,.3)!important}
+html.light .contact-card.resume .cc-icon{border-color:rgba(47,111,232,.25)!important}
+html.light .ov-nav{border-bottom:1px solid rgba(47,111,232,.1)!important}
+html.light .back-btn{color:#5a6478!important}
+html.light .back-btn:hover{color:#1f56c9!important}
+html.light .ov-num{color:#5a6478!important}
+html.light .ov-eyebrow{color:#2f6fe8!important}
+html.light .ov-title em{color:#2f6fe8!important}
+html.light .ov-tag{border:1px solid rgba(47,111,232,.2)!important;color:#2f6fe8!important}
+html.light .ov-desc{color:#5a6478!important}
+html.light .ov-sec{color:#2f6fe8!important}
+html.light .ov-hl{border:1px solid rgba(47,111,232,.1)!important}
+html.light .ov-hl:hover{border-color:rgba(47,111,232,.3)!important}
+html.light .ov-hln{color:rgba(47,111,232,.25)!important}
+html.light .ov-hlt{color:#5a6478!important}
+html.light .ov-hlt strong{color:#0b1220!important}
+html.light .proj-tag--link{color: #2f6fe8!important;border-color: #2f6fe8!important}
+html.light .proj-tag--link:hover{background: rgba(47,111,232, 0.15)!important}
+html.light .tool-chip{background:rgba(47,111,232,.08)!important;border:1px solid rgba(47,111,232,.3)!important}
+html.light .holo-pad{border:1px solid rgba(47,111,232,.35)!important;box-shadow:0 0 0 6px rgba(47,111,232,.04),inset 0 -4px 10px rgba(0,0,0,.5)!important}
+html.light .holo-pad::after{background:#1f56c9!important}
+html.light .holo-beam{background:linear-gradient(to top,rgba(47,111,232,.38),rgba(110,155,240,.12) 55%,rgba(110,155,240,0))!important}
+html.light .holo-icon svg{stroke:#2f6fe8!important;filter:drop-shadow(0 0 6px rgba(90,140,240,.6))!important}
+html.light .holo-tags .tool-chip{box-shadow:0 0 14px rgba(47,111,232,.25)!important}
+html.light /* scanlines + flicker on the projection */
+.holo-proj::after{background:repeating-linear-gradient(to bottom,rgba(120,165,245,.07) 0 1px,transparent 1px 4px)!important}
+html.light .holo.on .holo-pad{box-shadow:0 0 30px rgba(47,111,232,.55),0 0 0 6px rgba(47,111,232,.08),inset 0 -4px 10px rgba(0,0,0,.4)!important}
+html.light .rm-box{border:1px solid rgba(47,111,232,.3)!important;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(47,111,232,.12)!important}
+html.light .rm-btn{background:rgba(47,111,232,.08)!important;border:1px solid rgba(47,111,232,.3)!important}
+html.light .rm-btn:hover{background:rgba(47,111,232,.18)!important}
+html.light /* 3D board inside the project popup */
+.proj-model{background:radial-gradient(ellipse at center,rgba(47,111,232,.14),transparent 70%)!important;border:1px solid rgba(47,111,232,.15)!important}
+html.light .proj-model .pm-hint{color:#5a6478!important}
+html.light .proj-model .pm-flip{color:#1f56c9!important;border:1px solid rgba(47,111,232,.3)!important}
+html.light .proj-model .pm-flip:hover{background:rgba(47,111,232,.15)!important}
+html.light /* ── LIGHT MODE ── */
+.theme-toggle{border:1px solid rgba(47,111,232,.45)!important;background:linear-gradient(90deg,#1f5fd6,#2f6fe8)!important;box-shadow:0 0 18px rgba(47,111,232,.3)!important}
+html.light #projOverlay .proj-gallery img{border: 1px solid rgba(47,111,232,.15)!important}
+
+.holo-beam{z-index:1}.holo-proj{z-index:3}.holo-pad{z-index:2}
+/* ── pastel pink light theme ── */
+html.light .holo-proj::after{mix-blend-mode:normal!important;background:repeating-linear-gradient(to bottom,rgba(47,111,232,.06) 0 1px,transparent 1px 4px)!important}
+html.light .holo-icon svg{stroke-width:2.4}
+html.light{--bg:#eef2fb;--ink:#0b1220;--muted:#5a6478;--accent:#2f6fe8;--accent2:#1f56c9;--line:rgba(47,111,232,.18);--card:#ffffff}
+html.light .hero::after{background:linear-gradient(180deg,rgba(238,242,251,.55) 0%,transparent 25%,transparent 80%,var(--bg) 100%),linear-gradient(90deg,rgba(238,242,251,.35) 0%,transparent 50%)!important}
+html.light #pleatCanvas{filter:none}
+html.light #conCanvas{filter:invert(1) sepia(1) saturate(4) hue-rotate(185deg) brightness(.75)!important;opacity:.7}
+html.light .contact-section{background:linear-gradient(180deg,var(--bg) 0%,#e2eafb 100%)!important}
+html.light nav{background:linear-gradient(90deg,rgba(255,255,255,.94),rgba(244,247,255,.94))!important;border-bottom:1px solid rgba(47,111,232,.25)!important}
+html.light .theme-toggle{background:linear-gradient(90deg,#6f9cf2,#2f6fe8)!important;border-color:rgba(47,111,232,.5)!important;box-shadow:0 0 18px rgba(47,111,232,.3)!important}
+html.light .holo-stage{background:radial-gradient(ellipse at 50% 35%,#ffffff,#e3ebfc 75%)!important;border:1px solid rgba(47,111,232,.2);box-shadow:0 20px 50px rgba(30,70,170,.12)!important}
+html.light .holo-stage .tool-chip{color:#1f56c9!important;background:#fff!important;border-color:rgba(47,111,232,.35)!important;box-shadow:0 4px 14px rgba(47,111,232,.15)!important}
+html.light .holo-icon svg{stroke:#2f6fe8!important;filter:drop-shadow(0 0 6px rgba(90,140,240,.6))!important}
+html.light .holo-beam{background:linear-gradient(to top,rgba(120,165,245,.5),rgba(47,111,232,.12) 55%,rgba(47,111,232,0))!important}
+html.light .holo-pad{background:radial-gradient(ellipse at center,#eef3ff 0%,#d5e2fb 55%,#b8cdf5 100%)!important;border-color:rgba(47,111,232,.45)!important}
+html.light .holo-pad::after{background:#2f6fe8!important}
+html.light .holo.on .holo-pad{box-shadow:0 0 30px rgba(47,111,232,.55)!important}
+html.light .holo-name{color:#6b7a96!important}html.light .holo.on .holo-name,html.light .holo:hover .holo-name{color:#1f56c9!important}
+html.light #projOverlay [style*="#3d9bff"]{color:var(--accent)!important;border-color:rgba(47,111,232,.3)!important}
+html.light #projOverlay [style*="#4d6a90"]{color:var(--muted)!important}
+html.light #projOverlay .proj-nav-bar{background:rgba(238,242,251,.9)!important}
+html.light .cad-canvas-wrap{background:linear-gradient(135deg,#fafbfe,#e8effc)!important}
+html.light .proj-model{background:radial-gradient(ellipse at center,rgba(110,155,240,.2),transparent 70%)!important;border-color:rgba(47,111,232,.2)!important}
+html.light #cur{background:var(--accent)!important;box-shadow:0 0 14px var(--accent)!important}
+html.light #cur.hov{background:transparent!important;border-color:var(--accent)!important}
+html.light .btn-solid{color:#fff!important}
+html.light .orb1{background:radial-gradient(circle,rgba(110,155,240,.18) 0%,transparent 70%)!important}
+html.light .orb2{background:radial-gradient(circle,rgba(130,170,245,.14) 0%,transparent 70%)!important}
+
+html.light .marquee-wrap{background:linear-gradient(90deg,rgba(160,182,238,.85),rgba(190,196,242,.85))!important;border-color:rgba(47,111,232,.3)!important}
+html.light .m-item{color:#243560!important}html.light .m-item.hi{color:#1f56c9!important}html.light .m-dot{background:#1f56c9!important}
+html.light .cad-canvas-wrap{background:linear-gradient(135deg,#fafbfe,#e9eef8)!important}
+
+/* ── calendly-style light theme: periwinkle gradient, white cards, black→blue ── */
+html.light body{background:linear-gradient(160deg,#e9effc 0%,#d3dff9 45%,#c9d6f6 70%,#e7ecfb 100%) fixed!important}
+html.light .hero::after{background:linear-gradient(180deg,rgba(233,239,252,.4) 0%,transparent 25%,transparent 85%,rgba(211,223,249,.0) 100%)!important}
+html.light section{background:transparent}
+html.light nav{background:rgba(255,255,255,.72)!important;border-bottom:1px solid rgba(47,111,232,.14)!important}
+html.light .proj-card,html.light .cad-card,html.light .td-card,html.light .contact-card{background:#fbfbfd!important;border-color:rgba(47,111,232,.12)!important;box-shadow:0 12px 34px rgba(30,60,140,.08)!important;border-radius:14px}
+html.light .contact-section{background:transparent!important}
+html.light .hero-name,html.light .about-text h2,html.light .contact-heading{color:#0b1220}
+
+/* skills: no panel, beams a touch deeper; page bg = multi-tone aurora like the reference */
+html.light .holo-stage{background:none!important;border:0!important;box-shadow:none!important;padding:0!important}
+html.light .holo-beam{background:linear-gradient(to top,rgba(31,86,201,.5),rgba(47,111,232,.18) 55%,rgba(47,111,232,0))!important}
+html.light .holo-pad{background:radial-gradient(ellipse at center,#c9d9fb 0%,#9db8ef 55%,#7f9fe0 100%)!important;border-color:rgba(31,86,201,.5)!important}
+html.light .holo-pad::after{background:#1f56c9!important}
+html.light body{background:
+  radial-gradient(60vw 50vh at 0% 55%,rgba(206,186,240,.75),transparent 70%),
+  radial-gradient(55vw 45vh at 100% 20%,rgba(120,160,240,.7),transparent 70%),
+  radial-gradient(50vw 45vh at 70% 100%,rgba(176,232,224,.65),transparent 70%),
+  radial-gradient(45vw 40vh at 30% 0%,rgba(198,222,250,.9),transparent 70%),
+  linear-gradient(160deg,#dbe6fa,#c9d7f5 50%,#d9e6f4) fixed!important;background-attachment:fixed!important}
+
+/* light mode: soft fog instead of the constellation */
+#fogCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;display:none}
+html.light #fogCanvas{display:block;filter:blur(3px)}
+html.light #pleatCanvas{opacity:.7}
+html.light #conCanvas{display:none!important}
+
+html.light .art-tab{background:rgba(120,145,210,.18)!important;border-color:rgba(47,111,232,.14)!important;color:#5a6680!important;border-radius:10px;backdrop-filter:blur(6px)}
+html.light .art-tab:hover{background:rgba(255,255,255,.75)!important;color:#1f56c9!important}
+html.light .art-tab.active{background:#fff!important;color:#1f56c9!important;border-color:rgba(47,111,232,.45)!important;box-shadow:0 6px 18px rgba(30,70,170,.12)}
+html.light .art-tabs{gap:8px}
+
+/* CAD: all 4 cards fit in one row on desktop — no hidden cards, no scrolling */
+@media(min-width:901px){.cad-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible!important;cursor:auto!important}.cad-card{flex:none!important;min-width:0}.cad-canvas-wrap{height:230px}}
+.cad-more{display:none!important}
+
+/* resume download button readable in light mode */
+html.light .rm-btn.solid{background:#2f6fe8!important;color:#fff!important;border-color:#2f6fe8!important}
+html.light .rm-btn.solid:hover{background:#1f56c9!important}
+html.light .rm-btn{color:#1f56c9!important}
+/* compact tools list on phones: 2 columns, smaller chips */
+@media(max-width:900px){
+  .tools-list{display:grid!important;grid-template-columns:1fr 1fr;column-gap:16px}
+  .tools-group{padding:10px 0}
+  .tools-gname{font-size:9px;margin-bottom:7px}
+  .tools-chips{gap:4px}
+  .tools-chips .tool-chip{font-size:8.5px;padding:4px 7px;letter-spacing:.08em}
+}
+
+/* ticker: seamless loop (track as wide as its content so -50% lands exactly on the copy) */
+.marquee-track{width:max-content;will-change:transform;backface-visibility:hidden}
 </style>
 </head>
 
@@ -411,6 +613,11 @@ html {
     <li><a href="#contact">Contact</a></li>
   </ul>
   <!-- menu -->
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light mode" aria-pressed="false">
+    <span class="tt-knob"></span>
+    <span class="tt-ico tt-moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></span>
+    <span class="tt-ico tt-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></span>
+  </button>
   <button id="menuBtn" style="display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px">
     <span class="bar"></span>
     <span class="bar"></span>
@@ -429,7 +636,7 @@ html {
 
 <section class="hero" id="home">
   <canvas id="pleatCanvas" aria-hidden="true"></canvas>
-  <canvas id="conCanvas"></canvas> <!--constellation-->
+  <canvas id="conCanvas"></canvas><canvas id="fogCanvas" aria-hidden="true"></canvas> <!--constellation-->
   <div class="hero-text">
     <p class="hero-eyebrow">Electrical and Computer Engineering Student @ NYU</p>
     <h1 class="hero-name">Preme<br><em>Malaviphusit</em></h1>
@@ -477,7 +684,7 @@ html {
       <button class="holo h1" type="button" aria-pressed="false" aria-label="Show PCB / Layout tools">
         <span class="holo-proj">
           <span class="holo-icon"><svg viewBox="0 0 64 64"><rect x="18" y="18" width="28" height="28" rx="3"/><rect x="26" y="26" width="12" height="12"/><path d="M24 18v-8M32 18v-8M40 18v-8M24 46v8M32 46v8M40 46v8M18 24h-8M18 32h-8M18 40h-8M46 24h8M46 32h8M46 40h8"/><circle cx="24" cy="8" r="2"/><circle cx="40" cy="56" r="2"/><circle cx="8" cy="32" r="2"/><circle cx="56" cy="24" r="2"/></svg></span>
-          <span class="holo-tags"><span class="tool-chip" style="--i:0">Altium Designer</span><span class="tool-chip" style="--i:1">Cadence</span></span>
+          <span class="holo-tags"><span class="tool-chip" style="--i:0">Altium Designer</span><span class="tool-chip" style="--i:1">KiCad</span><span class="tool-chip" style="--i:2">Cadence Virtuoso</span></span>
         </span>
         <span class="holo-beam"></span>
         <span class="holo-pad"></span>
@@ -495,7 +702,7 @@ html {
       <button class="holo h3" type="button" aria-pressed="false" aria-label="Show Coding tools">
         <span class="holo-proj">
           <span class="holo-icon"><svg viewBox="0 0 64 64"><rect x="6" y="10" width="52" height="44" rx="3"/><path d="M6 20h52"/><circle cx="12" cy="15" r="1.5"/><circle cx="18" cy="15" r="1.5"/><path d="M24 30l-7 7 7 7M40 30l7 7-7 7M35 27l-6 20"/></svg></span>
-          <span class="holo-tags"><span class="tool-chip" style="--i:0">C / C++</span><span class="tool-chip" style="--i:1">Python</span><span class="tool-chip" style="--i:2">Java</span><span class="tool-chip" style="--i:3">MATLAB</span><span class="tool-chip" style="--i:4">HTML</span></span>
+          <span class="holo-tags"><span class="tool-chip" style="--i:0">C / C++</span><span class="tool-chip" style="--i:1">Python</span><span class="tool-chip" style="--i:2">Java</span><span class="tool-chip" style="--i:3">MATLAB</span><span class="tool-chip" style="--i:4">HTML / CSS</span></span>
         </span>
         <span class="holo-beam"></span>
         <span class="holo-pad"></span>
@@ -504,7 +711,7 @@ html {
       <button class="holo h4" type="button" aria-pressed="false" aria-label="Show CAD tools">
         <span class="holo-proj">
           <span class="holo-icon"><svg viewBox="0 0 64 64"><path d="M32 6l22 12v28L32 58 10 46V18z"/><path d="M10 18l22 12 22-12M32 30v28"/><path d="M21 24l22 12M43 24L21 36" stroke-dasharray="2 4" opacity=".6"/></svg></span>
-          <span class="holo-tags"><span class="tool-chip" style="--i:0">SolidWorks</span><span class="tool-chip" style="--i:1">Fusion 360</span></span>
+          <span class="holo-tags"><span class="tool-chip" style="--i:0">SolidWorks</span><span class="tool-chip" style="--i:1">Fusion 360</span><span class="tool-chip" style="--i:2">Onshape</span></span>
         </span>
         <span class="holo-beam"></span>
         <span class="holo-pad"></span>
@@ -521,10 +728,10 @@ html {
       </button>
     </div>
     <div class="tools-list">
-      <div class="tools-group"><p class="tools-gname">PCB / Layout</p><div class="tools-chips"><span class="tool-chip">Altium Designer</span><span class="tool-chip">Cadence</span></div></div>
+      <div class="tools-group"><p class="tools-gname">PCB / Layout</p><div class="tools-chips"><span class="tool-chip">Altium Designer</span><span class="tool-chip">KiCad</span><span class="tool-chip">Cadence Virtuoso</span></div></div>
       <div class="tools-group"><p class="tools-gname">Bench Tools</p><div class="tools-chips"><span class="tool-chip">LTspice</span><span class="tool-chip">Oscilloscope</span><span class="tool-chip">DMM</span><span class="tool-chip">Logic Analyzer</span></div></div>
-      <div class="tools-group"><p class="tools-gname">Coding</p><div class="tools-chips"><span class="tool-chip">C / C++</span><span class="tool-chip">Python</span><span class="tool-chip">Java</span><span class="tool-chip">MATLAB</span><span class="tool-chip">HTML</span></div></div>
-      <div class="tools-group"><p class="tools-gname">CAD</p><div class="tools-chips"><span class="tool-chip">SolidWorks</span><span class="tool-chip">Fusion 360</span></div></div>
+      <div class="tools-group"><p class="tools-gname">Coding</p><div class="tools-chips"><span class="tool-chip">C / C++</span><span class="tool-chip">Python</span><span class="tool-chip">Java</span><span class="tool-chip">MATLAB</span><span class="tool-chip">HTML / CSS</span></div></div>
+      <div class="tools-group"><p class="tools-gname">CAD</p><div class="tools-chips"><span class="tool-chip">SolidWorks</span><span class="tool-chip">Fusion 360</span><span class="tool-chip">Onshape</span></div></div>
       <div class="tools-group"><p class="tools-gname">Creative Tools</p><div class="tools-chips"><span class="tool-chip">TouchDesigner</span><span class="tool-chip">Adobe</span><span class="tool-chip">Blender</span></div></div>
     </div>
   </div>
@@ -788,10 +995,10 @@ html {
       </div>
       <div class="cc-arrow">↗</div>
     </a>
-    <a href="mailto:nutchapreme8811@gmail.com" class="contact-card">
+    <a href="mailto:nm4659@nyu.edu" class="contact-card">
       <div class="cc-left">
         <div class="cc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg></div>
-        <div><p class="cc-label">Email me</p><p class="cc-value">nutchapreme8811@gmail.com</p></div>
+        <div><p class="cc-label">Email me</p><p class="cc-value">nm4659@nyu.edu</p></div>
       </div>
       <div class="cc-arrow">↗</div>
     </a>
@@ -836,7 +1043,7 @@ html {
 
 <footer>
   <p>© 2026 Preme Malaviphusit</p>
-  <p>Available for internship</p>
+  <p>Available for Internship</p>
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -934,6 +1141,23 @@ mq.innerHTML += mq.innerHTML;
   const g = new T.Group();
   scene.add(g);
   g.position.y = 0.2;
+  // light/dark theme: deeper, less glowy astronaut on the light background
+  const panelMats = [], PINK_DOTS = [0x5f9bff, 0xd6e6ff, 0x2f6fe8];
+  function panelTint(){ const pk = document.documentElement.classList.contains('light');
+    panelMats.forEach(([m, c], i) => { const v = pk ? PINK_DOTS[i % 3] : c; m.color.setHex(v); m.emissive.setHex(v); m.emissiveIntensity = pk ? 1.4 : 2.5; }); }
+  const amb = scene.children.find(o => o.isAmbientLight);
+  const DARK = { suit:0x5bbcee, dark:0x1a4a88, acc:0x22aaee, accE:.6, ring:0x3388cc, glass:0xaaddff, glassO:.55, key:3.0, front:2.0, rim:1.5, amb:1.0 };
+  const LITE = { suit:0x7ea3ea, dark:0x2f56a6, acc:0x3f7ce6, accE:.2, ring:0x3060bb, glass:0xcfe0fa, glassO:.55, key:.95, front:.6, rim:.45, amb:1.25 };
+  function astroTheme(){ const L = document.documentElement.classList.contains('light') ? LITE : DARK;
+    suitMat.color.setHex(L.suit); suitDarkMat.color.setHex(L.dark); accentMat.color.setHex(L.acc); accentMat.emissiveIntensity = L.accE;
+    ringMat.color.setHex(L.ring); glassMat.color.setHex(L.glass); glassMat.opacity = L.glassO;
+    key.intensity = L.key; front.intensity = L.front; rim.intensity = L.rim; if (amb) amb.intensity = L.amb;
+    const pk = L === LITE; key.color.setHex(pk ? 0xeef4ff : 0x88ddff); front.color.setHex(pk ? 0xcfe0ff : 0x44ccff); rim.color.setHex(pk ? 0x6f9cf2 : 0x00aaff);
+    fill.color.setHex(pk ? 0x2f6fe8 : 0x1155aa); under.color.setHex(pk ? 0x8fb0ee : 0x0044aa); if (amb) amb.color.setHex(pk ? 0x7488bd : 0x0a2a4a);
+    glowMat.color.setHex(pk ? 0xd6e6ff : 0x88eeff); glowMat.emissive.setHex(pk ? 0x5f9bff : 0x44ccff); accentMat.emissive.setHex(pk ? 0x1f56c9 : 0x0066bb); }
+  new MutationObserver(panelTint).observe(document.documentElement, { attributes:true, attributeFilter:['class'] });
+  astroTheme(); new MutationObserver(astroTheme).observe(document.documentElement, { attributes:true, attributeFilter:['class'] });
+
 
   // ── HELMET
   g.add(new T.Mesh(new T.SphereGeometry(1, 64, 64), suitMat));
@@ -1001,7 +1225,7 @@ mq.innerHTML += mq.innerHTML;
   // Panel lights — blue/cyan tones to match vibe
   [[-0.14, -1.58, 0.69, 0x00eeff], [0, -1.58, 0.69, 0x4488ff], [0.14, -1.58, 0.69, 0x0099ff]].forEach(([x, y, z, col]) => {
     const dot = new T.Mesh(new T.SphereGeometry(0.038, 12, 12),
-      new T.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 2.5 }));
+      (m => (panelMats.push([m, col]), panelTint(), m))(new T.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 2.5 })));
     dot.position.set(x, y, z); g.add(dot);
   });
 
@@ -1547,6 +1771,11 @@ document.addEventListener('keydown', e => {
     const dl2=new T.DirectionalLight(0x80c8ff,1.5); dl2.position.set(-2,1,-2); scene.add(dl2);
     scene.add(new T.HemisphereLight(0x112244,0x0a1a30,1));
     const mat = new T.MeshStandardMaterial({color:0x7ab0d0,metalness:0.55,roughness:0.35,emissive:0x0a1525,emissiveIntensity:0.3});
+    const cadTheme=()=>{const pk=document.documentElement.classList.contains('light');
+      mat.color.setHex(pk?0x5a6a86:0x7ab0d0); mat.emissive.setHex(pk?0x000000:0x0a1525); mat.metalness=pk?.25:.55; mat.roughness=pk?.55:.35;
+      dl1.color.setHex(pk?0xffffff:0x4fa3ff); dl1.intensity=pk?1.6:3; dl2.color.setHex(pk?0x6f9cf2:0x80c8ff); dl2.intensity=pk?1.2:1.5;
+      scene.children.forEach(o=>{ if(o.isAmbientLight){o.color.setHex(pk?0x6a7890:0x334466); o.intensity=pk?.9:1.8;} if(o.isHemisphereLight){o.color.setHex(pk?0xf0f5ff:0x112244); o.intensity=pk?.5:1;} });};
+    cadTheme(); new MutationObserver(cadTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
     const buf = rawBuf || b64ToBuffer(STL_DATA[canvasId]);
     const geo = parseSTL(buf);
@@ -1615,6 +1844,7 @@ document.addEventListener('keydown', e => {
     let autoR=0;
     (function loop(){
       requestAnimationFrame(loop);
+      { const w=wrap.clientWidth, hh=wrap.clientHeight; if(w&&hh&&(Math.abs(w-renderer.domElement.clientWidth)>1||Math.abs(cam.aspect-w/hh)>.01)){ renderer.setSize(w,hh,false); cam.aspect=w/hh; cam.updateProjectionMatrix(); } }
       if(!isDown) autoR+=0.005;
       pivot.rotation.y=(rotY*Math.PI/180)+autoR;
       pivot.rotation.x=rotX*Math.PI/180;
@@ -1830,20 +2060,21 @@ window.ProjModel=(function(){
     const cv=document.createElement('canvas'); box.prepend(cv);
     const r=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true}); r.setPixelRatio(Math.min(devicePixelRatio,2)); r.outputEncoding=T.sRGBEncoding;
     const sc=new T.Scene(), cam=new T.PerspectiveCamera(32,1,.01,100); cam.position.set(0,0,6);
-    sc.add(new T.HemisphereLight(0xdcecff,0x0a1426,.9)); const k=new T.DirectionalLight(0xffffff,.9); k.position.set(2,3,5); sc.add(k);
+    const hl=new T.HemisphereLight(0xdcecff,0x0a1426,.9); sc.add(hl); const k=new T.DirectionalLight(0xffffff,.9); k.position.set(2,3,5); sc.add(k);
     const fl=new T.DirectionalLight(0x80c8ff,.5); fl.position.set(-3,-2,-4); sc.add(fl);
+    const pmTheme=()=>{const pk=document.documentElement.classList.contains('light'); hl.color.setHex(pk?0xe6efff:0xdcecff); hl.groundColor.setHex(pk?0x14244a:0x0a1426); k.color.setHex(pk?0xffffff:0xffffff); fl.color.setHex(pk?0x6f9cf2:0x80c8ff); fl.intensity=pk?.8:.5;};
+    pmTheme(); new MutationObserver(pmTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
     const g=new T.Group(); sc.add(g);
-    const s={r,sc,cam,g,rx:-.35,ry:.35,trx:-.35,try_:.35,down:false,run:false,url:null,box};
+    const s={r,sc,cam,g,rx:0,ry:0,trx:0,try_:0,down:false,run:false,url:null,box};
     let lx=0,ly=0;
     const dn=(x,y)=>{s.down=true;lx=x;ly=y;}, mv=(x,y)=>{if(!s.down)return;s.try_+=(x-lx)*.01;s.trx=Math.max(-1.2,Math.min(1.2,s.trx+(y-ly)*.01));lx=x;ly=y;};
     cv.addEventListener('mousedown',e=>dn(e.clientX,e.clientY)); addEventListener('mousemove',e=>mv(e.clientX,e.clientY)); addEventListener('mouseup',()=>s.down=false);
     cv.addEventListener('touchstart',e=>dn(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
     cv.addEventListener('touchmove',e=>{mv(e.touches[0].clientX,e.touches[0].clientY);e.preventDefault();},{passive:false});
     cv.addEventListener('touchend',()=>s.down=false);
-    box.querySelector('.pm-flip').addEventListener('click',()=>{s.try_+=Math.PI;});
+    box.querySelector('.pm-flip').addEventListener('click',()=>{s.trx=0; s.try_=Math.round(s.try_/Math.PI)*Math.PI+Math.PI;});
     const loop=()=>{ if(!s.run) return; requestAnimationFrame(loop);
       const w=box.clientWidth,h=box.clientHeight; if(cv.width!==Math.round(w*r.getPixelRatio())){r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
-      if(!s.down) s.try_+=.003;
       s.rx+=(s.trx-s.rx)*.12; s.ry+=(s.try_-s.ry)*.12; g.rotation.set(s.rx,s.ry,0); r.render(sc,cam); };
     s.loop=loop; return s;
   }
@@ -1852,10 +2083,57 @@ window.ProjModel=(function(){
     if(st.url!==url){ st.url=url; while(st.g.children.length) st.g.remove(st.g.children[0]);
       new THREE.GLTFLoader().load(url,gl=>{ const m=gl.scene, b=new THREE.Box3().setFromObject(m), c=b.getCenter(new THREE.Vector3()), z=b.getSize(new THREE.Vector3());
         const sc=3.4/Math.max(z.x,z.y); m.scale.setScalar(sc); m.position.set(-c.x*sc,-c.y*sc,-c.z*sc); st.g.add(m); }); }
-    st.trx=-.35; st.try_=.35; st.run=true; st.loop(); return true;
+    st.trx=0; st.try_=0; st.rx=0; st.ry=0; st.run=true; st.loop(); return true;
   }
   function hide(){ if(st) st.run=false; }
   return {show,hide};
+})();
+</script>
+<script>
+// light / dark toggle
+(function(){
+  const b=document.getElementById('themeToggle'); if(!b) return;
+  const root=document.documentElement, sync=()=>b.setAttribute('aria-pressed',root.classList.contains('light'));
+  sync();
+  b.addEventListener('click',()=>{root.classList.toggle('light');sync();try{sessionStorage.setItem('theme',root.classList.contains('light')?'light':'dark')}catch(e){}});
+})();
+</script>
+<script>
+// Light mode hero: 3 soft, lumpy fog-clouds beside the astronaut. Each cloud is a cluster of soft puffs;
+// the mouse pushes individual puffs aside (like stirring fog) and they drift back into shape.
+(function(){
+  const cv=document.getElementById('fogCanvas'); if(!cv) return;
+  const x=cv.getContext('2d'), hero=cv.parentElement, root=document.documentElement;
+  let W=0,H=0,dpr=1,puffs=[],mx=-1e4,my=-1e4,last=-1e9,run=false,act=0;
+  const puffImg=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+    const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.45,'rgba(255,255,255,.75)');r.addColorStop(.75,'rgba(246,249,255,.3)');r.addColorStop(1,'rgba(240,245,255,0)');
+    g.fillStyle=r;g.fillRect(0,0,128,128);return c;})();
+  function size(){ dpr=Math.min(devicePixelRatio||1,2); W=hero.clientWidth; H=hero.clientHeight; cv.width=W*dpr; cv.height=H*dpr; x.setTransform(dpr,0,0,dpr,0,0);
+    let s=5; const r=()=>(s=(s*16807)%2147483647)/2147483647;
+    const mob=W<900, C=mob?[[.5,.56,170],[.30,.66,120],[.72,.5,110]]:[[.69,.36,290],[.56,.58,190],[.47,.33,170]];
+    puffs=[];
+    for(const [fx,fy,w] of C){ const cx=fx*W, cy=fy*H, n=Math.round(w/5);
+      for(let i=0;i<n;i++){ const t=r(), ang=r()*Math.PI*2, rad=Math.sqrt(r());
+        const hx=cx+Math.cos(ang)*rad*w*.42, hy=cy+Math.sin(ang)*rad*w*.12-Math.pow(1-Math.abs(Math.cos(ang)),1.5)*w*.1*(Math.sin(ang)<0?1:.2);   // flat bottom, domed top
+        puffs.push({hx,hy,x:hx,y:hy,vx:0,vy:0,r:w*(.2+r()*.16),a:.28+r()*.22,ph:r()*6.28}); } } }
+  size(); addEventListener('resize',()=>{ if(Math.abs(hero.clientWidth-W)>2) size(); });
+  addEventListener('mousemove',e=>{const b=cv.getBoundingClientRect();mx=e.clientX-b.left;my=e.clientY-b.top;last=performance.now();},{passive:true});
+  function frame(now){
+    if(!root.classList.contains('light')){run=false;return;}
+    requestAnimationFrame(frame);
+    act+=((now-last<1200?1:0)-act)*.08;
+    x.clearRect(0,0,W,H);
+    for(const p of puffs){
+      const tx=p.hx+Math.sin(now/3800+p.ph)*6, ty=p.hy+Math.cos(now/4300+p.ph)*4;
+      const dx=p.x-mx, dy=p.y-my, d=Math.hypot(dx,dy)||1, R=150;
+      if(d<R&&act>.05){ const f=(1-d/R)*1.6*act; p.vx+=dx/d*f; p.vy+=dy/d*f; }
+      p.vx+=(tx-p.x)*.012; p.vy+=(ty-p.y)*.012; p.vx*=.9; p.vy*=.9; p.x+=p.vx; p.y+=p.vy;
+      x.globalAlpha=p.a; x.drawImage(puffImg,p.x-p.r,p.y-p.r,p.r*2,p.r*2);
+    }
+    x.globalAlpha=1;
+  }
+  const start=()=>{ if(!run&&root.classList.contains('light')){run=true;requestAnimationFrame(frame);} };
+  start(); new MutationObserver(start).observe(root,{attributes:true,attributeFilter:['class']});
 })();
 </script>
 </body>
