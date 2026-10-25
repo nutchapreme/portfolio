@@ -2694,6 +2694,16 @@ document.addEventListener('keydown', e => {
   addEventListener('scroll', () => { if (!running && scrollY < spacer.offsetHeight) { running = true; requestAnimationFrame(frameLoop); } }, { passive: true });
   requestAnimationFrame(frameLoop);
 
+  // once you reach the site, fold the ride away so scrolling up can't go back into it (the nav coaster button brings it back)
+  let folded = false, foldT = 0;
+  function fold() { if (folded || autoOn) return; const h = spacer.offsetHeight; if (scrollY < h - 2) return;
+    const y = scrollY - h; folded = true; running = false; window.__rideCover = false;
+    spacer.style.display = 'none'; cv.style.visibility = 'hidden'; ui.style.display = 'none';
+    const rb = document.getElementById('rideRestart'); if (rb) rb.style.display = 'none';
+    window.scrollTo({ top: Math.max(0, y), behavior: 'instant' }); }
+  addEventListener('scroll', () => { clearTimeout(foldT); foldT = setTimeout(fold, 150); }, { passive: true });
+  window.__rideReopen = () => { stopAuto(); if (folded) { folded = false; spacer.style.display = ''; ui.style.display = ''; const rb = document.getElementById('rideRestart'); if (rb) rb.style.display = ''; lockSpacer(); }
+    window.scrollTo({ top: 0, behavior: 'instant' }); lastP = -1; if (!running) { running = true; requestAnimationFrame(frameLoop); } };
   document.getElementById('rideSkip').addEventListener('click', () => { stopAuto(); document.getElementById('home').scrollIntoView({ behavior: 'smooth' }); });
   // auto ride: glides through the whole ride on its own (~40s); any touch / wheel / key takes back control
   const autoBtn = document.getElementById('rideAuto'); let autoOn = false, aPrev = 0;
@@ -2888,6 +2898,6 @@ window.ProjModel=(function(){
   b.addEventListener('click',()=>{ const a=document.getElementById('rideAuto'); if(a&&a.textContent.indexOf('Pause')>-1) a.click(); scrollTo({top:0,behavior:'instant'}); });
 })();
 </script>
-<script>document.querySelector('.ride-again').addEventListener('click',e=>{e.preventDefault();scrollTo({top:0,behavior:'instant'});});</script>
+<script>document.querySelector('.ride-again').addEventListener('click',e=>{e.preventDefault(); if(window.__rideReopen) window.__rideReopen(); else scrollTo({top:0,behavior:'instant'});});</script>
 </body>
 </html>
