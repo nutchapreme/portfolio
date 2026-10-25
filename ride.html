@@ -678,6 +678,13 @@ html.light .proj-model .pm-hint{color:#5a6478}
 @media(max-width:900px){.cad-grid{overflow:visible!important}.cad-card{flex:none!important;width:100%!important;min-width:0;height:auto!important}.cad-canvas-wrap{height:240px}}
 @media(hover:none),(max-width:768px){.cad-hint,.proj-model .pm-hint{display:none!important}}
 @media(hover:none){.art-circle:hover .art-overlay{opacity:0}.art-circle:hover{transform:none}.art-circle.show .art-overlay{opacity:1}}
+
+#rideRestart{position:fixed;left:28px;bottom:76px;z-index:220;box-sizing:border-box;height:38px;padding:0 16px;display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#80c8ff;background:rgba(4,12,24,.6);border:1px solid rgba(61,155,255,.35);cursor:pointer;backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s,bottom .35s cubic-bezier(.22,1,.36,1)}
+#rideRestart.show{opacity:1;pointer-events:auto}
+#rideRestart.solo{bottom:28px}
+#rideRestart:hover{background:rgba(61,155,255,.15);color:#ddeeff}
+html.light #rideRestart.solo{background:#fff;color:#1f56c9;border-color:rgba(47,111,232,.4)}
+@media(max-width:600px){#rideRestart{left:16px;bottom:68px;height:36px;padding:0 12px}#rideRestart.solo{bottom:22px}}
 </style>
 </head>
 
@@ -722,6 +729,7 @@ html.light .proj-model .pm-hint{color:#5a6478}
 <!-- coaster intro ride (js/ride.js) -->
 <div class="ride-spacer" id="ride" aria-hidden="true"></div>
 <canvas id="rideCanvas" aria-hidden="true"></canvas>
+<button id="rideRestart" type="button">↺ Restart ride</button>
 <div id="rideUI"><div class="hint"><span>Move your mouse · Scroll to board</span><i></i></div><button id="rideAuto" type="button">▶ Auto ride</button><button id="rideSkip">Skip the ride ↓</button></div>
 
 <section class="hero" id="home">
@@ -832,7 +840,7 @@ html.light .proj-model .pm-hint{color:#5a6478}
 <section id="projects" class="projects-section">
   <div class="proj-header reveal">
     <div class="sec-label" style="margin-bottom:0">Project</div>
-    <div class="drag-hint"><span class="drag-arr">←</span> <span class="t-desk">Scroll to explore</span><span class="t-mob">Drag to explore</span></div>
+    <div class="drag-hint"><span class="drag-arr">←</span> <span class="t-desk">Scroll to explore</span><span class="t-mob">Swipe to explore</span></div>
   </div>
   <div class="proj-track" id="projTrack">
     <div class="proj-card" data-id="0">
@@ -944,7 +952,7 @@ html.light .proj-model .pm-hint{color:#5a6478}
         <div class="poster-card"><img src="6.png" alt="Welcome Freshmen"/><div class="poster-overlay"><div class="poster-overlay-title">Welcome Freshmen</div><div class="poster-overlay-desc">Incoming freshmen welcome poster for NYU TSA with Thai temple skyline motif</div></div></div>
         <div style="flex-shrink:0;width:52px"></div>
       </div>
-      <p class="drag-sub">← <span class="t-desk">Scroll to explore</span><span class="t-mob">Drag to explore</span></p>
+      <p class="drag-sub">← <span class="t-desk">Scroll to explore</span><span class="t-mob">Swipe to explore</span></p>
     </div>
   </div>
 
@@ -998,7 +1006,7 @@ html.light .proj-model .pm-hint{color:#5a6478}
     <div class="td-intro reveal">
       <p class="td-eyebrow">// Simulation</p>
     </div>
-    <p class="drag-sub td-hint reveal"><span class="t-desk">Scroll to explore</span><span class="t-mob">Drag to explore</span> →</p>
+    <p class="drag-sub td-hint reveal"><span class="t-desk">Scroll to explore</span><span class="t-mob">Swipe to explore</span> →</p>
     <div class="td-grid reveal">
       <div class="td-card">
         <div class="td-video-wrap">
@@ -2880,6 +2888,14 @@ window.ProjModel=(function(){
     if(dx>0) ov.style.transform=`translateX(${dx}px)`; },{passive:true});
   ov.addEventListener('touchend',()=>{ if(!on) return; on=false; ov.style.transition='';
     if(dx>innerWidth*.28) back.click(); else ov.style.transform='translateX(0)'; });
+})();
+</script>
+<script>
+// restart the ride: shows once you've started; sits above Auto ride during the ride, drops into its spot after
+(function(){ const b=document.getElementById('rideRestart'), sp=document.getElementById('ride'); if(!b||!sp) return;
+  const upd=()=>{ const y=scrollY, H=sp.offsetHeight; b.classList.toggle('show', y>40); b.classList.toggle('solo', y>H*.88); };
+  addEventListener('scroll',upd,{passive:true}); upd();
+  b.addEventListener('click',()=>{ const a=document.getElementById('rideAuto'); if(a&&a.textContent.indexOf('Pause')>-1) a.click(); scrollTo({top:0,behavior:'instant'}); });
 })();
 </script>
 </body>
