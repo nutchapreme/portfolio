@@ -251,7 +251,7 @@ footer p{font-size:11px;letter-spacing:.06em;color:var(--muted)}
   .poster-card{width:220px}
 
   /* faster ticker on mobile */
-  .marquee-track{animation-duration:9s}
+  .marquee-track{animation-duration:24s}
 
   /* wider + shorter project cards, same font sizes */
   .proj-card{width:88vw;max-width:430px;padding:26px 22px}
@@ -593,6 +593,21 @@ html.light .rm-btn{color:#1f56c9!important}
 
 /* ticker: seamless loop (track as wide as its content so -50% lands exactly on the copy) */
 .marquee-track{width:max-content;will-change:transform;backface-visibility:hidden}
+
+/* project cards: no description, front/back board stack that fans out on hover */
+.proj-card .proj-desc{display:none}
+.proj-card.no-img .proj-desc{display:block}
+.proj-stack{position:relative;height:200px;margin:6px 0 24px;z-index:1}
+.proj-stack img{position:absolute;max-width:76%;max-height:160px;object-fit:contain;filter:drop-shadow(0 16px 26px rgba(0,0,0,.45));transition:transform .55s cubic-bezier(.22,1,.36,1),filter .4s}
+.proj-stack .ps-back{right:0;top:0;transform:rotate(5deg);filter:drop-shadow(0 16px 26px rgba(0,0,0,.45)) brightness(.88)}
+.proj-stack .ps-front{left:0;bottom:0;transform:rotate(-3deg)}
+.proj-card:hover .ps-back{transform:translate(12px,-12px) rotate(8deg)}
+.proj-card:hover .ps-front{transform:translate(-10px,8px) rotate(-6deg) scale(1.03)}
+.proj-stack.single .ps-front{left:50%;top:50%;bottom:auto;max-width:60%;transform:translate(-50%,-50%)}
+.proj-card:hover .proj-stack.single .ps-front{transform:translate(-50%,-52%) scale(1.06)}
+html.light .proj-stack img{filter:drop-shadow(0 14px 22px rgba(30,60,140,.22))}
+html.light .proj-stack .ps-back{filter:drop-shadow(0 14px 22px rgba(30,60,140,.22)) brightness(.95)}
+@media(max-width:768px){.proj-stack{height:170px}.proj-stack img{max-height:135px}}
 </style>
 </head>
 
@@ -746,46 +761,46 @@ html.light .rm-btn{color:#1f56c9!important}
   </div>
   <div class="proj-track" id="projTrack">
     <div class="proj-card" data-id="0">
-      <img src="SharkFin_front.png" alt="SharkFin v1.0 PCB" class="proj-pcb-img proj-pcb-sharkfin"/>
       <span class="proj-num">01</span>
-      <h3 class="proj-title">SharkFin v.1.0</h3>
+      <h3 class="proj-title">SharkFin Rev 1.0</h3>
+      <div class="proj-stack"><img class="ps-back" src="SharkFin_back.png" alt="" onerror="this.remove()"/><img class="ps-front" src="SharkFin_front.png" alt="SharkFin Rev 1.0 PCB"/></div>
       <p class="proj-desc">Custom STM32H743-based vision board for target-tracking robots. Features OV5640 camera, peripheral breakout, USB-C, SD card logging, and onboard buzzer.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32H743</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Embedded Vision</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="1">
-      <img src="Payload_front.png" alt="NYU Rogue Aerospace payload PCB" class="proj-pcb-img proj-pcb-payload"/>
       <span class="proj-num">02</span>
       <h3 class="proj-title">NYU Rogue Aerospace: <br>Payload Board</h3>
-      <p class="proj-desc">Designing the water-ejection payload for NYU’s rocketry team end to end — apogee detection, valve and motor actuation, embedded firmware, and a custom PCB taken from perfboard prototype to fabricated board.</p>
+      <div class="proj-stack"><img class="ps-back" src="Payload_back.png" alt="" onerror="this.remove()"/><img class="ps-front" src="Payload_front.png" alt="NYU Rogue Aerospace payload PCB"/></div>
+      <p class="proj-desc">Designing the water-ballast payload for NYU’s rocketry team end to end — apogee detection, valve and motor actuation, embedded firmware, and a custom PCB taken from perfboard prototype to fabricated board.</p>
       <div class="proj-tags"><span class="proj-tag">Payload Systems</span><span class="proj-tag">Altium Designer</span><span class="proj-tag">Embedded C</span><span class="proj-tag">Avionics</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="2">
-      <img src="Drone.png" alt="Drone Flight Controller PCB" class="proj-pcb-img proj-pcb-drone"/>
       <span class="proj-num">03</span>
       <h3 class="proj-title">Drone Flight Controller</h3>
+      <div class="proj-stack"><img class="ps-back" src="Drone_back.png" alt="" onerror="this.remove()"/><img class="ps-front" src="Drone.png" alt="Drone Flight Controller PCB"/></div>
       <p class="proj-desc">Custom STM32F405-based quadcopter flight controller PCB with 4-motor ESC outputs, USB-C programming, SWD debug interface, and a 5–36V wide-input power system.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">STM32F405</span><span class="proj-tag">PCB Layout</span><span class="proj-tag">Power Systems</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="3">
-      <img src="pcb.png" alt="STM32F405 Development Board PCB" class="proj-pcb-img"/>
       <span class="proj-num">04</span>
       <h3 class="proj-title">Custom STM32F405 Development Board</h3>
+      <div class="proj-stack"><img class="ps-back" src="pcb_back.png" alt="" onerror="this.remove()"/><img class="ps-front" src="pcb.png" alt="STM32F405 Development Board PCB"/></div>
       <p class="proj-desc">Custom PCB projects spanning power management, sensor interfacing, and microcontroller breakout boards — from schematic capture to fabrication-ready Gerber files.</p>
       <div class="proj-tags"><span class="proj-tag">Altium Designer</span><span class="proj-tag">PCB Layout &amp; Routing</span><span class="proj-tag">Schematic Design</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
     <div class="proj-card" data-id="4">
-      <img src="arc_logo.png" alt="NYU ARC Robotics Team Ultraviolet" class="proj-pcb-img proj-pcb-arc"/>
       <span class="proj-num">05</span>
       <h3 class="proj-title">NYU ARC Robotics: <br>Team Ultraviolet</h3>
+      <div class="proj-stack single"><img class="ps-front" src="arc_logo.png" alt="NYU ARC Robotics Team Ultraviolet"/></div>
       <p class="proj-desc">Supporting electronics for NYU’s combat robotics team — LTspice simulation and bench validation of the supercapacitor power circuit, controller repair, and training new members on robot wiring.</p>
       <div class="proj-tags"><span class="proj-tag">LTspice</span><span class="proj-tag">Circuit Simulation</span><span class="proj-tag">Soldering</span> <span class="proj-tag">Team Training</span></div>
       <span href="#" class="proj-link">View project</span>
     </div>
-    <div class="proj-card" data-id="5">
+    <div class="proj-card no-img" data-id="5">
       <span class="proj-num">06</span>
       <h3 class="proj-title">Lower Body Exoskeleton</h3>
       <p class="proj-desc">Lower-limb exoskeleton for ACL rehabilitation with encoder-based PID control via L298N motor driver, achieving less than 5° joint overshoot.</p>
@@ -976,6 +991,10 @@ html.light .rm-btn{color:#1f56c9!important}
   <div class="exp-item reveal" style="transition-delay:.1s">
     <p class="exp-year">Aug 2025 — Now</p>
     <div><h3 class="exp-role">Undergraduate Teaching Assistant / Prototyping Head</h3><p class="exp-co">NYU General Engineering Department | Brooklyn, NY</p><p class="exp-desc">Led technical labs in CAD, coding, circuitry, and prototyping while mentoring student teams and supporting CAD troubleshooting, soldering instruction, and 3D printing workflows.</p></div>
+  </div>
+  <div class="exp-item reveal" style="transition-delay:.15s">
+    <p class="exp-year">Sep 2025 — Dec 2025</p>
+    <div><h3 class="exp-role">Computer Vision Researcher</h3><p class="exp-co">Flexible AI-Enabled Mechatronic Systems Lab | Brooklyn, NY</p><p class="exp-desc">Developed a kidney stone detection pipeline using TensorFlow and PyTorch for real-time endoscopic imaging, and generated 3D volumetric heat maps in 3D Slicer to support laser ablation planning.</p></div>
   </div>
   <div class="exp-item reveal" style="transition-delay:.2s">
     <p class="exp-year">Jun 2023 — Jul 2023</p>
@@ -1295,7 +1314,7 @@ mq.innerHTML += mq.innerHTML;
 const PROJECTS = [
   {
     num: '01 / 06', eye: 'PCB Design · Embedded Vision',
-    title: 'SharkFin <em>v.1.0</em>',
+    title: 'SharkFin <em>Rev 1.0</em>',
     tags: ['Altium Designer', 'STM32H743', 'OV5640', 'PCB Layout', 'Embedded Vision'],
     desc: 'A custom vision and tracking board built around the STM32H743VIH6 — a high-performance Cortex-M7 MCU. Features a 6-axis ICM-40609-D IMU for motion sensing, full power muxing between 5V LiPo and USB-C, triple LDO regulation (1.2V, 2.8V, 3.3V) for the camera and MCU rails, SD card logging, buzzer, SWD debug port, and a full peripheral breakout. Designed entirely in Altium Designer.',
     model: 'img/sharkfin.glb',
@@ -1320,9 +1339,9 @@ const PROJECTS = [
     imgBack: './Payload_back.png',
     imgSize: '400px',
     gallery: ['./rogue_team.jpg', './rogue1.jpg', './rogue2.jpg'],
-    desc: 'Designed the water-ejection payload for NYU’s competitive rocketry team end to end — system architecture, circuit design, embedded firmware, and the board itself. The payload detects apogee barometrically, opens a servo valve, then drives a motor to push water out of the tank. Took it from breadboard concept through a soldered perfboard build to a custom PCB, consolidating what had been an Arduino Nano, motor driver, and EasyMini altimeter into one LiPo-powered board. Also work on avionics and communications — GPS tracking and RF telemetry between the rocket and ground station — and spray-painted the competition airframe.',
+    desc: 'Designed the water-ballast payload for NYU’s competitive rocketry team end to end — system architecture, circuit design, embedded firmware, and the board itself. The payload detects apogee barometrically, opens a servo valve, then drives a motor to push water out of the tank. Took it from breadboard concept through a soldered perfboard build to a custom PCB, consolidating what had been an Arduino Nano, motor driver, and EasyMini altimeter into one LiPo-powered board. Also work on avionics and communications — GPS tracking and RF telemetry between the rocket and ground station — and spray-painted the competition airframe.',
     highlights: [
-      { n:'01', t:'<strong>Full-stack payload design</strong> — carried the water-ejection system from architecture and circuit design through embedded programming, perfboard prototype, and custom PCB — concept to flight hardware.' },
+      { n:'01', t:'<strong>Full-stack payload design</strong> — carried the water-ballast system from architecture and circuit design through embedded programming, perfboard prototype, and custom PCB — concept to flight hardware.' },
       { n:'02', t:'<strong>Barometric apogee detection</strong> — MS5611 pressure sensor with firmware that identifies apogee from the altitude curve and fires the deployment sequence autonomously.' },
       { n:'03', t:'<strong>Two-stage ejection actuation</strong> — servo valve opens the tank, then a motor drives water out, sequenced and timed in firmware.' },
       { n:'04', t:'<strong>Board consolidation</strong> — replaced a stack of Arduino Nano, motor driver, and EasyMini altimeter with a single LiPo-powered PCB, cutting wiring failure points and payload bay volume.' },
