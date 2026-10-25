@@ -2124,7 +2124,7 @@ document.addEventListener('keydown', e => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!T || !spacer || !cv || reduced) { if (spacer) spacer.remove(); if (cv) cv.remove(); if (ui) ui.remove(); return; }
   if (nav) nav.style.opacity = 0;   // nav arrives at the end of the ride
-  if (matchMedia('(hover:none)').matches) { const hs = ui.querySelector('.hint span'); if (hs) hs.textContent = 'Scroll to board'; }
+  if (matchMedia('(hover:none)').matches) { const hs = ui.querySelector('.hint span'); if (hs) hs.textContent = 'Swipe sideways to look around · Scroll to board'; }
 
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const range = (p, a, b) => clamp((p - a) / (b - a));
@@ -2543,6 +2543,10 @@ document.addEventListener('keydown', e => {
   let pmx = 0, pmy = 0, smx = 0, smy = 0, lastMove = -1e9;
   addEventListener('mousemove', e => { pmx = e.clientX / innerWidth * 2 - 1; pmy = e.clientY / innerHeight * 2 - 1; lastMove = performance.now(); }, { passive: true });
   const noHover = matchMedia('(hover:none)').matches;
+  // phones: drag sideways to swing the view (vertical drags still scroll the page)
+  let tx0 = 0, pmx0 = 0;
+  addEventListener('touchstart', e => { tx0 = e.touches[0].clientX; pmx0 = pmx; }, { passive: true });
+  addEventListener('touchmove', e => { const dx = e.touches[0].clientX - tx0; pmx = clamp(pmx0 + dx / innerWidth * 2.2, -1, 1); pmy = 0; lastMove = performance.now(); }, { passive: true });
   function introPose(t) {
     smx += (pmx - smx) * .06; smy += (pmy - smy) * .06;
     const bend = clamp(Math.hypot(smx, smy * 1.4));                // 0 = flat 2D, 1 = full perspective
@@ -2662,7 +2666,10 @@ document.addEventListener('keydown', e => {
   function stopAuto() { autoOn = false; autoBtn.textContent = '▶ Auto ride'; }
   let aPos = 0;
   function autoStep(now) { if (!autoOn) return; const dt = Math.min(100, now - (aPrev || now)); aPrev = now;
-    const end = spacer.offsetTop + spacer.offsetHeight; const v = spacer.offsetHeight / 32000;
+    const end = spacer.offsetTop + spacer.offsetHeight; const fr = clamp(aPos / spacer.offsetHeight), q = (fr - P0) / (1 - P0);
+    // auto-ride pacing: gentle at the launch, normal at the board, brisk through the finale into the site
+    const mult = fr < P0 ? 1 : q < WQ[1] ? .55 : q < WQ[3] ? 1 : fr < .85 ? 1.9 : 2.6;
+    const v = spacer.offsetHeight / 30000 * mult;
     aPos = Math.min(end, aPos + v * dt);                                  // own float position: iOS drops sub-pixel scroll steps
     if (aPos >= end - 2) { stopAuto(); return; }
     window.scrollTo({ top: Math.round(aPos), behavior: 'instant' });   // 'instant' — the page's smooth-scroll would restart every step and stall
