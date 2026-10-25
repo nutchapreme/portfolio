@@ -870,7 +870,7 @@ html.light .ride-again{color:#1e2a44}
 <section id="projects" class="projects-section">
   <div class="proj-header reveal">
     <div class="sec-label" style="margin-bottom:0">Project</div>
-    <div class="drag-hint"><span class="drag-arr">←</span> <span class="t-desk">Scroll to explore</span><span class="t-mob">Swipe to explore</span></div>
+    <div class="drag-hint"><span class="drag-arr">←</span> <span class="t-desk">Swipe to explore</span><span class="t-mob">Swipe to explore</span></div>
   </div>
   <div class="proj-track" id="projTrack">
     <div class="proj-card" data-id="0">
@@ -982,7 +982,7 @@ html.light .ride-again{color:#1e2a44}
         <div class="poster-card"><img src="6.png" alt="Welcome Freshmen"/><div class="poster-overlay"><div class="poster-overlay-title">Welcome Freshmen</div><div class="poster-overlay-desc">Incoming freshmen welcome poster for NYU TSA with Thai temple skyline motif</div></div></div>
         <div style="flex-shrink:0;width:52px"></div>
       </div>
-      <p class="drag-sub">← <span class="t-desk">Scroll to explore</span><span class="t-mob">Swipe to explore</span></p>
+      <p class="drag-sub">← <span class="t-desk">Swipe to explore</span><span class="t-mob">Swipe to explore</span></p>
     </div>
   </div>
 
@@ -1036,11 +1036,11 @@ html.light .ride-again{color:#1e2a44}
     <div class="td-intro reveal">
       <p class="td-eyebrow">// Simulation</p>
     </div>
-    <p class="drag-sub td-hint reveal"><span class="t-desk">Scroll to explore</span><span class="t-mob">Swipe to explore</span> →</p>
+    <p class="drag-sub td-hint reveal"><span class="t-desk">Swipe to explore</span><span class="t-mob">Swipe to explore</span> →</p>
     <div class="td-grid reveal">
       <div class="td-card">
         <div class="td-video-wrap">
-          <iframe src="https://www.youtube-nocookie.com/embed/zLvL5eJ2T9Y?rel=0&amp;playsinline=1&amp;modestbranding=1" title="Particle System" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="display:block;width:100%;height:100%;border:0"></iframe>
+          <iframe src="https://www.youtube.com/embed/zLvL5eJ2T9Y?rel=0&amp;playsinline=1&amp;modestbranding=1" title="Particle System" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="display:block;width:100%;height:100%;border:0"></iframe>
         </div>
         <div class="td-info">
           <h3 class="td-title">Particle System</h3>
@@ -1050,7 +1050,7 @@ html.light .ride-again{color:#1e2a44}
       </div>
       <div class="td-card">
         <div class="td-video-wrap">
-          <iframe src="https://www.youtube-nocookie.com/embed/mZWk4KzDEcY?rel=0&amp;playsinline=1&amp;modestbranding=1" title="First Park ride simulation" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="display:block;width:100%;height:100%;border:0"></iframe>
+          <iframe src="https://www.youtube.com/embed/mZWk4KzDEcY?rel=0&amp;playsinline=1&amp;modestbranding=1" title="First Park ride simulation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="display:block;width:100%;height:100%;border:0"></iframe>
         </div>
         <div class="td-info">
           <h3 class="td-title">First Ride</h3>
@@ -1060,7 +1060,7 @@ html.light .ride-again{color:#1e2a44}
       </div>
       <div class="td-card">
         <div class="td-video-wrap">
-          <iframe src="https://www.youtube-nocookie.com/embed/qOyqiiSyMF8?rel=0&amp;playsinline=1&amp;modestbranding=1" title="RTL Verification" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="display:block;width:100%;height:100%;border:0"></iframe>
+          <iframe src="https://www.youtube.com/embed/qOyqiiSyMF8?rel=0&amp;playsinline=1&amp;modestbranding=1" title="RTL Verification" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="display:block;width:100%;height:100%;border:0"></iframe>
         </div>
         <div class="td-info">
           <h3 class="td-title">RTL Verification</h3>
@@ -2858,20 +2858,6 @@ window.ProjModel=(function(){
   pages.addEventListener('touchmove',e=>{ if(e.touches.length===2&&d0){ e.preventDefault(); const r=pages.getBoundingClientRect();
     setZ(z0*dist(e.touches)/d0,(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,(e.touches[0].clientY+e.touches[1].clientY)/2-r.top); } },{passive:false});
   pages.addEventListener('touchend',e=>{ if(e.touches.length<2) d0=0; });
-})();
-</script>
-<script>
-// desktop: mouse wheel scrolls these rows sideways (then hands back to the page at the ends)
-(function(){
-  if(matchMedia('(hover:none)').matches) return;
-  ['projTrack','posterTrack'].map(id=>document.getElementById(id)).concat([...document.querySelectorAll('.td-grid')]).forEach(el=>{
-    if(!el) return;
-    el.addEventListener('wheel',e=>{ if(Math.abs(e.deltaX)>Math.abs(e.deltaY)) return;
-      const max=el.scrollWidth-el.clientWidth; if(max<=0) return;
-      const next=el.scrollLeft+e.deltaY; if((e.deltaY<0&&el.scrollLeft<=0)||(e.deltaY>0&&el.scrollLeft>=max-1)) return;
-      e.preventDefault(); el.style.scrollSnapType='none'; el.scrollLeft=Math.max(0,Math.min(max,next));
-      clearTimeout(el._snapT); el._snapT=setTimeout(()=>{el.style.scrollSnapType='';},180); },{passive:false});
-  });
 })();
 </script>
 <script>
