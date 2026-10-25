@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>window.gateRAF=function(fn){return requestAnimationFrame(function(t){ if(window.__rideCover||document.hidden){ setTimeout(function(){gateRAF(fn)},250); } else fn(t); });};</script>
+
 <script>try{localStorage.removeItem("theme");if(sessionStorage.getItem("theme")==="light")document.documentElement.classList.add("light")}catch(e){}</script>
 
 <meta charset="UTF-8"/>
@@ -633,8 +635,8 @@ html.light .proj-stack .ps-back{filter:drop-shadow(0 14px 22px rgba(30,60,140,.2
 @media(max-width:768px){.proj-stack{height:170px}.proj-stack img{max-height:135px}}
 
 /* ARC logo: dark glow behind so it reads on any background */
-.proj-stack.single::before{content:'';position:absolute;left:50%;top:50%;width:62%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(2,6,16,.92) 0%,rgba(2,6,16,.7) 45%,rgba(2,6,16,0) 72%);z-index:0}
-.proj-stack.single .ps-front{z-index:1;filter:drop-shadow(0 0 10px rgba(0,0,0,.8))!important}
+.proj-stack.single::before{content:none}
+.proj-stack.single .ps-front{z-index:1;filter:drop-shadow(0 0 1.5px rgba(2,8,24,.9)) drop-shadow(0 0 8px rgba(61,155,255,.85)) drop-shadow(0 0 22px rgba(61,155,255,.55))!important}
 
 html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
 /* mobile resume viewer: pages fit the width, pinch / buttons to zoom (min = fit) */
@@ -651,6 +653,8 @@ html.light .nav-logo img{filter:brightness(0) invert(.22);opacity:1}
 @media(max-width:600px){#rideAuto,#rideSkip{bottom:22px;height:36px;padding:0 12px}}
 
 @media(max-width:768px){.proj-stack img{max-width:62%}.proj-stack .ps-back{right:9%}.proj-stack .ps-front{left:9%}}
+
+html{overflow-anchor:none}   /* stop the browser "jumping" the page when things above change size */
 </style>
 </head>
 
@@ -1336,7 +1340,7 @@ mq.innerHTML += mq.innerHTML;
   let currentRY = 0;
 
   (function loop(){
-    requestAnimationFrame(loop);
+    gateRAF(loop);
     t += 0.009;
 
     // Float
@@ -1766,7 +1770,7 @@ document.addEventListener('keydown', e => {
   }
 
   (function animate(){
-    requestAnimationFrame(animate);
+    gateRAF(animate);
     ctx.clearRect(0,0,W,H);
     drawLines();
     const t=Date.now()*.001;
@@ -1910,6 +1914,7 @@ document.addEventListener('keydown', e => {
 
     let autoR=0;
     (function loop(){
+      const rr=canvas.getBoundingClientRect(); if(!canvas.offsetParent||rr.bottom<0||rr.top>innerHeight){ setTimeout(()=>requestAnimationFrame(loop),300); return; }
       requestAnimationFrame(loop);
       { const w=wrap.clientWidth, hh=wrap.clientHeight; if(w&&hh&&(Math.abs(w-renderer.domElement.clientWidth)>1||Math.abs(cam.aspect-w/hh)>.01)){ renderer.setSize(w,hh,false); cam.aspect=w/hh; cam.updateProjectionMatrix(); } }
       if(!isDown) autoR+=0.005;
@@ -2552,6 +2557,7 @@ document.addEventListener('keydown', e => {
   function progress() { const h = spacer.offsetHeight; return clamp(scrollY / h); }
   let running = true, lastP = -1;
   function frameLoop(now) {
+    window.__rideCover = progress() < .86;
     const t = now / 1000, pRaw = progress(), intro = pRaw < P0, p = intro ? 0 : warp((pRaw - P0) / (1 - P0));
     const k = ease(range(pRaw, .01, P0));   // 0 = boarding shot, 1 = inside the helmet
 
@@ -2635,7 +2641,7 @@ document.addEventListener('keydown', e => {
     if (p !== lastP || p < 1) renderer.render(scene, cam);
     lastP = p;
     cv.style.visibility = p >= 1 ? 'hidden' : 'visible';
-    if (running) requestAnimationFrame(frameLoop);
+    if (running) requestAnimationFrame(frameLoop); else window.__rideCover = false;
   }
   // pause the render loop once the ride is fully scrolled past
   new IntersectionObserver(es => { const was = running; running = es[0].isIntersecting || scrollY < spacer.offsetHeight; if (running && !was) requestAnimationFrame(frameLoop); }).observe(spacer);
@@ -2751,7 +2757,7 @@ window.ProjModel=(function(){
   addEventListener('mousemove',e=>{const b=cv.getBoundingClientRect();mx=e.clientX-b.left;my=e.clientY-b.top;last=performance.now();},{passive:true});
   function frame(now){
     if(!root.classList.contains('light')){run=false;return;}
-    requestAnimationFrame(frame);
+    gateRAF(frame);
     act+=((now-last<1200?1:0)-act)*.08;
     x.clearRect(0,0,W,H);
     for(const p of puffs){
