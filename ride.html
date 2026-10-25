@@ -83,7 +83,7 @@ nav.scrolled{border-color:var(--line)}
 .marquee-wrap{position:relative;z-index:1;overflow:hidden;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(61,155,255,.025)}
 .marquee-track{display:flex;white-space:nowrap;animation:marquee 24s linear infinite}
 
-@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes marquee{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
 .m-item{font-family:'Fraunces',serif;font-size:13px;font-weight:300;font-style:italic;color:var(--muted);padding:0 24px;display:inline-flex;align-items:center;gap:24px}
 .m-item.hi{color:var(--accent2)}
 .m-dot{width:3px;height:3px;border-radius:50%;background:var(--accent);flex-shrink:0}
@@ -617,7 +617,7 @@ html.light .rm-btn{color:#1f56c9!important}
 }
 
 /* ticker: seamless loop (track as wide as its content so -50% lands exactly on the copy) */
-.marquee-track{width:max-content;will-change:transform;backface-visibility:hidden}
+.marquee-track{width:max-content}
 
 /* project cards: no description, front/back board stack that fans out on hover */
 .proj-card .proj-desc{display:none}
@@ -685,6 +685,12 @@ html.light .proj-model .pm-hint{color:#5a6478}
 #rideRestart:hover{background:rgba(61,155,255,.15);color:#ddeeff}
 html.light #rideRestart.solo{background:#fff;color:#1f56c9;border-color:rgba(47,111,232,.4)}
 @media(max-width:600px){#rideRestart{left:16px;bottom:68px;height:36px;padding:0 12px}#rideRestart.solo{bottom:22px}}
+
+.ride-again{display:inline-flex;align-items:center;justify-content:center;width:48px;height:34px;margin-left:22px;color:#cfe6ff;opacity:.85;transition:opacity .2s,transform .3s}
+.ride-again svg{width:46px;height:30px}
+.ride-again:hover{opacity:1;transform:translateX(-3px)}
+html.light .ride-again{color:#1e2a44}
+@media(max-width:768px){.ride-again{margin-left:auto;margin-right:10px}.theme-toggle{margin-left:0!important}}
 </style>
 </head>
 
@@ -705,6 +711,7 @@ html.light #rideRestart.solo{background:#fff;color:#1f56c9;border-color:rgba(47,
     <li><a href="#contact">Contact</a></li>
   </ul>
   <!-- menu -->
+  <a class="ride-again" href="#top-ride" title="Ride again" aria-label="Ride the coaster again"><svg viewBox="0 0 56 36" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 31c14-5 36-5 50-1"/><path d="M9 25h31c5 0 9-3.5 10-8l-12 0"/><path d="M9 25V12.5c0-1.4 1.1-2.5 2.5-2.5H15l3 7h20"/><circle cx="23" cy="10" r="3.2"/><path d="M23 13.2v3.8"/><path d="M28 17c2-2 4-2 6 0"/><circle cx="15" cy="28.5" r="2.2"/><circle cx="35" cy="28.5" r="2.2"/><path d="M12 21h24" opacity=".6"/></svg></a>
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light mode" aria-pressed="false">
     <span class="tt-knob"></span>
     <span class="tt-ico tt-moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></span>
@@ -751,6 +758,18 @@ html.light #rideRestart.solo{background:#fff;color:#1f56c9;border-color:rgba(47,
 
 <div class="marquee-wrap">
   <div class="marquee-track" id="mq">
+    <span class="m-item hi">PCB Design <span class="m-dot"></span></span>
+    <span class="m-item">Circuit Simulation <span class="m-dot"></span></span>
+    <span class="m-item hi">Embedded Programming <span class="m-dot"></span></span>
+    <span class="m-item">MATLAB <span class="m-dot"></span></span>
+    <span class="m-item hi">Python <span class="m-dot"></span></span>
+    <span class="m-item">C · C++ <span class="m-dot"></span></span>
+    <span class="m-item hi">PCB Design <span class="m-dot"></span></span>
+    <span class="m-item">Circuit Simulation <span class="m-dot"></span></span>
+    <span class="m-item hi">Hardware Debugging <span class="m-dot"></span></span>
+    <span class="m-item">MATLAB <span class="m-dot"></span></span>
+    <span class="m-item hi">Python <span class="m-dot"></span></span>
+    <span class="m-item">C · C++ <span class="m-dot"></span></span>
     <span class="m-item hi">PCB Design <span class="m-dot"></span></span>
     <span class="m-item">Circuit Simulation <span class="m-dot"></span></span>
     <span class="m-item hi">Embedded Programming <span class="m-dot"></span></span>
@@ -1200,7 +1219,7 @@ function switchTab(tab) {
 
 // Marquee
 const mq = document.getElementById('mq');
-mq.innerHTML += mq.innerHTML;
+/* ticker content is duplicated in the HTML */
 
 // ── Astronaut
 (function(){
@@ -2152,7 +2171,7 @@ document.addEventListener('keydown', e => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!T || !spacer || !cv || reduced) { if (spacer) spacer.remove(); if (cv) cv.remove(); if (ui) ui.remove(); return; }
   if (nav) nav.style.opacity = 0;   // nav arrives at the end of the ride
-  if (matchMedia('(hover:none)').matches) { const hs = ui.querySelector('.hint span'); if (hs) hs.textContent = 'Swipe sideways to look around · Scroll to board'; }
+  if (matchMedia('(hover:none)').matches) { const hs = ui.querySelector('.hint span'); if (hs) hs.textContent = 'Swipe to look around · Scroll to board'; }
 
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const range = (p, a, b) => clamp((p - a) / (b - a));
@@ -2517,7 +2536,7 @@ document.addEventListener('keydown', e => {
   }, undefined, e => console.warn('[ride] board model failed, using flat render', e));
 
   /* ── component callouts (front-render pixel anchors → nearest top-side part) ── */
-  const CALLS = [['STM32H743', 'MCU', 668, 270], ['USB-C', '', 78, 130], ['Buzzer', '', 468, 210], ['SWD', '', 558, 45], ['Camera Port', 'OV5640', 1153, 310], ['PWM · UART · I²C', 'Breakout', 828, 500], ['SD Card Slot', '', null, null, 1]];
+  const CALLS = [['STM32H743', 'MCU', 668, 270], ['USB-C', '', 78, 130], ['Barometer', '', 468, 210], ['SWD', '', 558, 45], ['Camera Port', 'OV5640', 1153, 310], ['PWM · UART · I²C', 'Breakout', 828, 500], ['SD Card Slot', '', null, null, 1]];
   const calls = CALLS.map(([a, b, , , back]) => { const el = document.createElement('div'); el.className = 'rcall'; el.innerHTML = a + (b ? '<em>' + b + '</em>' : ''); ui.appendChild(el); return { el, part: null, back: !!back }; });
   let callsReady = false;
   function setupCalls() {
@@ -2893,10 +2912,11 @@ window.ProjModel=(function(){
 <script>
 // restart the ride: shows once you've started; sits above Auto ride during the ride, drops into its spot after
 (function(){ const b=document.getElementById('rideRestart'), sp=document.getElementById('ride'); if(!b||!sp) return;
-  const upd=()=>{ const y=scrollY, H=sp.offsetHeight; b.classList.toggle('show', y>40); b.classList.toggle('solo', y>H*.88); };
+  const upd=()=>{ const f=scrollY/sp.offsetHeight; b.classList.toggle('show', f>.1 && f<.78); };   // visible once you're seated (end of boarding) until the hand-off to the site
   addEventListener('scroll',upd,{passive:true}); upd();
   b.addEventListener('click',()=>{ const a=document.getElementById('rideAuto'); if(a&&a.textContent.indexOf('Pause')>-1) a.click(); scrollTo({top:0,behavior:'instant'}); });
 })();
 </script>
+<script>document.querySelector('.ride-again').addEventListener('click',e=>{e.preventDefault();scrollTo({top:0,behavior:'instant'});});</script>
 </body>
 </html>
