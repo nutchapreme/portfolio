@@ -2600,9 +2600,10 @@ document.addEventListener('keydown', e => {
   /* ── scroll → timeline ── */
   let lockH = 0; const lockSpacer = () => { if (noHoverS) { lockH = Math.round(innerHeight * 4.6); spacer.style.height = lockH + 'px'; } };
   lockSpacer(); let lw = innerWidth; addEventListener('resize', () => { if (innerWidth !== lw) { lw = innerWidth; lockSpacer(); } });
-  function progress() { const h = spacer.offsetHeight; return clamp(scrollY / h); }
-  let running = true, lastP = -1;
+  function progress() { const h = spacer.offsetHeight; return h > 0 ? clamp(scrollY / h) : 1; }
+  let running = true, lastP = -1, folded = false;
   function frameLoop(now) {
+    if (folded) { cv.style.visibility = 'hidden'; window.__rideCover = false; return; }
     window.__rideCover = progress() < .86;
     const t = now / 1000, pRaw = progress(), intro = pRaw < P0, p = intro ? 0 : warp((pRaw - P0) / (1 - P0));
     const k = ease(range(pRaw, .01, P0));   // 0 = boarding shot, 1 = inside the helmet
@@ -2696,15 +2697,17 @@ document.addEventListener('keydown', e => {
   requestAnimationFrame(frameLoop);
 
   // once you reach the site, fold the ride away so scrolling up can't go back into it (the nav coaster button brings it back)
-  let folded = false, foldT = 0;
+  let foldT = 0;
   function fold() { if (folded || autoOn) return; const h = spacer.offsetHeight; if (scrollY < h - 2) return;
     const y = scrollY - h; folded = true; running = false; window.__rideCover = false;
     spacer.style.display = 'none'; cv.style.visibility = 'hidden'; ui.style.display = 'none';
     const rb = document.getElementById('rideRestart'); if (rb) rb.style.display = 'none';
     window.scrollTo({ top: Math.max(0, y), behavior: 'instant' }); }
   addEventListener('scroll', () => { clearTimeout(foldT); foldT = setTimeout(fold, 150); }, { passive: true });
-  window.__rideReopen = () => { stopAuto(); if (folded) { folded = false; spacer.style.display = ''; ui.style.display = ''; const rb = document.getElementById('rideRestart'); if (rb) rb.style.display = ''; lockSpacer(); }
-    window.scrollTo({ top: 0, behavior: 'instant' }); lastP = -1; if (!running) { running = true; requestAnimationFrame(frameLoop); } };
+  let holdUntil = 0;   // swallow leftover trackpad momentum right after jumping back to the start
+  addEventListener('wheel', e => { if (performance.now() < holdUntil) e.preventDefault(); }, { passive: false });
+  window.__rideReopen = () => { stopAuto(); holdUntil = performance.now() + 800; if (folded) { folded = false; spacer.style.display = ''; ui.style.display = ''; const rb = document.getElementById('rideRestart'); if (rb) rb.style.display = ''; lockSpacer(); }
+    window.scrollTo({ top: 0, behavior: 'instant' }); requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' })); lastP = -1; if (!running) { running = true; requestAnimationFrame(frameLoop); } };
   document.getElementById('rideSkip').addEventListener('click', () => { stopAuto(); document.getElementById('home').scrollIntoView({ behavior: 'smooth' }); });
   // auto ride: glides through the whole ride on its own (~40s); any touch / wheel / key takes back control
   const autoBtn = document.getElementById('rideAuto'); let autoOn = false, aPrev = 0;
