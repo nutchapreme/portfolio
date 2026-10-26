@@ -577,8 +577,9 @@ html.light .art-tab.active{background:#fff!important;color:#1f56c9!important;bor
 html.light .art-tabs{gap:8px}
 
 /* CAD: all 4 cards fit in one row on desktop — no hidden cards, no scrolling */
-@media(min-width:901px){.cad-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible!important;cursor:auto!important}.cad-card{flex:none!important;min-width:0}.cad-canvas-wrap{height:230px}}
+@media(min-width:901px){.cad-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible!important;cursor:auto!important}.cad-card{flex:none!important;min-width:0}.cad-canvas-wrap{height:230px}}
 .cad-more{display:none!important}
+@media(min-width:1100px){.cad-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:18px!important}.cad-canvas-wrap{height:210px}}
 
 /* resume download button readable in light mode */
 html.light .rm-btn.solid{background:#2f6fe8!important;color:#fff!important;border-color:#2f6fe8!important}
@@ -889,7 +890,7 @@ html.light .ride-again{color:#1e2a44}
   <div class="art-tabs">
     <button class="art-tab active" onclick="switchTab('logos')">Logo Design</button>
     <button class="art-tab" onclick="switchTab('posters')">Poster Design</button>
-    <button class="art-tab" onclick="switchTab('cad')">CAD Design</button>
+    <button class="art-tab" onclick="switchTab('cad')">3D Modeling</button>
     <button class="art-tab" onclick="switchTab('td')">Simulation</button>
   </div>
 
@@ -974,7 +975,17 @@ html.light .ride-again{color:#1e2a44}
         <div class="cad-info">
           <h3 class="cad-title">Orion Stamp</h3>
           <p class="cad-desc">Orion, shaped like a leg, features its belt as the exoskeleton, with a stamping motion that mimics walking</p>
-          <span class="cad-badge">Fusion 360 · STL</span>
+          <span class="cad-badge">Onshape · STL</span>
+          <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
+        </div>
+      </div>
+
+      <div class="cad-card">
+        <div class="cad-canvas-wrap"><canvas id="cadCanvas5"></canvas></div>
+        <div class="cad-info">
+          <h3 class="cad-title">EG Ghost</h3>
+          <p class="cad-desc">Ghost character modeled and colored in Blender</p>
+          <span class="cad-badge">Blender · GLB</span>
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
         </div>
       </div>
@@ -1825,7 +1836,7 @@ document.addEventListener('keydown', e => {
     return geo;
   }
 
-  function cadViewer(canvasId, preRotX, rawBuf) {
+  function cadViewer(canvasId, preRotX, rawBuf, glb) {   // glb: a coloured model (keeps its own materials)
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const wrap = canvas.parentElement;
@@ -1842,9 +1853,16 @@ document.addEventListener('keydown', e => {
     const cadTheme=()=>{const pk=document.documentElement.classList.contains('light');
       mat.color.setHex(pk?0x5a6a86:0x7ab0d0); mat.emissive.setHex(pk?0x000000:0x0a1525); mat.metalness=pk?.25:.55; mat.roughness=pk?.55:.35;
       dl1.color.setHex(pk?0xffffff:0x4fa3ff); dl1.intensity=pk?1.6:3; dl2.color.setHex(pk?0x6f9cf2:0x80c8ff); dl2.intensity=pk?1.2:1.5;
-      scene.children.forEach(o=>{ if(o.isAmbientLight){o.color.setHex(pk?0x6a7890:0x334466); o.intensity=pk?.9:1.8;} if(o.isHemisphereLight){o.color.setHex(pk?0xf0f5ff:0x112244); o.intensity=pk?.5:1;} });};
+      if(glb){ dl1.color.setHex(0xffffff); dl1.intensity=pk?1.5:1.7; dl2.color.setHex(0xcfe0ff); dl2.intensity=.7; }
+      scene.children.forEach(o=>{ if(o.isAmbientLight){o.color.setHex(glb?0xffffff:pk?0x6a7890:0x334466); o.intensity=glb?(pk?.7:.55):pk?.9:1.8;} if(o.isHemisphereLight){o.color.setHex(glb?0xffffff:pk?0xf0f5ff:0x112244); o.intensity=glb?.6:pk?.5:1;} });};
     cadTheme(); new MutationObserver(cadTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
+    let box, sz, cx, cy, cz, mesh;
+    if (glb) {
+      renderer.outputEncoding = T.sRGBEncoding;
+      const b = new T.Box3().setFromObject(glb), c = b.getCenter(new T.Vector3()), s3 = b.getSize(new T.Vector3());
+      sz = Math.max(s3.x, s3.y, s3.z); mesh = glb; mesh.position.sub(c);
+    } else {
     const buf = rawBuf || b64ToBuffer(STL_DATA[canvasId]);
     const geo = parseSTL(buf);
     if (preRotX) geo.rotateX(preRotX);   // bake starting orientation
@@ -1854,12 +1872,13 @@ document.addEventListener('keydown', e => {
       if (dy >= dx && dy >= dz) geo.rotateZ(Math.PI/2); else if (dz >= dx && dz >= dy) geo.rotateY(Math.PI/2);
       geo.computeBoundingBox();
     }
-    const box = geo.boundingBox;
-    const cx=(box.max.x+box.min.x)/2, cy=(box.max.y+box.min.y)/2, cz=(box.max.z+box.min.z)/2;
-    const sz = Math.max(box.max.x-box.min.x, box.max.y-box.min.y, box.max.z-box.min.z);
-    const mesh = new T.Mesh(geo, mat); mesh.position.set(-cx,-cy,-cz);
+    box = geo.boundingBox;
+    cx=(box.max.x+box.min.x)/2; cy=(box.max.y+box.min.y)/2; cz=(box.max.z+box.min.z)/2;
+    sz = Math.max(box.max.x-box.min.x, box.max.y-box.min.y, box.max.z-box.min.z);
+    mesh = new T.Mesh(geo, mat); mesh.position.set(-cx,-cy,-cz);
+    }
     const pivot = new T.Group(); pivot.add(mesh); scene.add(pivot);
-    const z0 = rawBuf ? sz*1.15 : sz*1.9;   // long, thin rocket: start closer
+    const z0 = rawBuf ? sz*1.15*Math.max(1, 1.3/(W/H)) : glb ? sz*2.1 : sz*1.9;   // long rocket: back off on narrow cards   // long, thin rocket: start closer
     cam.position.set(0,0,z0); cam.lookAt(0,0,0);
 
     let isDown=false, mx=0, my=0, rotX=0, rotY=0, zoom=z0;
@@ -1937,6 +1956,7 @@ document.addEventListener('keydown', e => {
         fetch('baby_rocket.stl').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
           .then(b => cadViewer('cadCanvas4', 0, b))
           .catch(() => { msg.style.display = 'flex'; msg.textContent = 'Add baby_rocket.stl next to index.html to show the 3D model'; });
+        if (T.GLTFLoader) new T.GLTFLoader().load('img/eg_ghost.glb', g => cadViewer('cadCanvas5', 0, null, g.scene));
       },50);
     }
   };
