@@ -1,5 +1,5 @@
 /* Interactive nose cone: hover the parts, drag the payload board into the bay, watch the water ballast deploy.
-   Shown at the end of the Payload Board project page. Needs three.js r128 + GLTFLoader + img/nosecone.glb */
+   Shown at the top of the Payload Board project page. Needs three.js r128 + GLTFLoader + img/nosecone.glb */
 (function () {
   const T = window.THREE; if (!T || !T.GLTFLoader) return;
   const PAYLOAD_TITLE = 'Payload Board';          // which project page gets the demo
@@ -7,7 +7,7 @@
 
   /* ---------- styles ---------- */
   const css = `
-#noseDemo{margin:56px 0 24px;display:none}
+#noseDemo{margin:0 0 56px;padding-bottom:48px;border-bottom:1px solid rgba(61,155,255,.12);display:none}
 #noseDemo .nd-eye{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#3d9bff;margin-bottom:10px}
 #noseDemo .nd-title{font-family:'Fraunces',serif;font-weight:200;font-size:clamp(26px,4vw,44px);letter-spacing:-.02em;line-height:1;margin-bottom:10px}
 #noseDemo .nd-title em{color:#3d9bff}
@@ -43,6 +43,7 @@
 }
 html.light #noseDemo .nd-view{border-color:rgba(47,111,232,.15);background:radial-gradient(ellipse at 50% 55%,rgba(47,111,232,.12),transparent 70%)}
 html.light #noseDemo .nd-dock{border-color:rgba(47,111,232,.3)}
+html.light #noseDemo{border-bottom-color:rgba(47,111,232,.15)}
 html.light #noseDemo .nd-sub,html.light #noseDemo .nd-dock span,html.light #noseDemo .nd-hint{color:#5a6478}
 html.light #noseDemo .nd-eye,html.light #noseDemo .nd-title em{color:#1f56c9}
 html.light #noseDemo .nd-status{color:#1f56c9}
@@ -54,8 +55,8 @@ html.light #noseDemo .nd-reset{color:#1f56c9;background:rgba(255,255,255,.8);bor
 
   /* ---------- markup (appended to the end of the project page) ---------- */
   const host = document.querySelector('#projOverlay .proj-body-pad'); if (!host) return;
-  host.insertAdjacentHTML('beforeend', `
-<section id="noseDemo" aria-label="Interactive nose cone">
+  host.insertAdjacentHTML('afterbegin', `
+<div id="noseDemo" role="region" aria-label="Interactive nose cone">
   <p class="nd-eye">// Interactive · Load the payload</p>
   <h3 class="nd-title">Arm the <em>nose cone</em></h3>
   <p class="nd-sub"><span class="t-desk">Hover</span><span class="t-mob">Tap</span> the parts to see what each one does. Then grab the payload board and drop it into the nose cone to run the water-ballast sequence.</p>
@@ -63,7 +64,7 @@ html.light #noseDemo .nd-reset{color:#1f56c9;background:rgba(255,255,255,.8);bor
     <div class="nd-view"><div class="nd-load">Loading nose cone…</div><div class="nd-tip"><b></b><p></p></div><div class="nd-status"></div><span class="nd-hint"></span><button class="nd-reset" type="button">↺ Reset</button></div>
     <div class="nd-dock"><div class="nd-pcb" title="Payload board"><img src="${PCB_IMG}" alt="Payload board" draggable="false"></div><span>Hold &amp; drag the board<br>into the nose cone</span></div>
   </div>
-</section>`);
+</div>`);
   const box = document.getElementById('noseDemo'), view = box.querySelector('.nd-view'), tip = box.querySelector('.nd-tip'),
     statusEl = box.querySelector('.nd-status'), hintEl = box.querySelector('.nd-hint'), resetBtn = box.querySelector('.nd-reset'),
     dock = box.querySelector('.nd-dock'), pcb = box.querySelector('.nd-pcb'), loadEl = box.querySelector('.nd-load');
@@ -210,7 +211,7 @@ html.light #noseDemo .nd-reset{color:#1f56c9;background:rgba(255,255,255,.8);bor
   }
   let mv = null;
   view.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') mv = e; });
-  view.addEventListener('pointerleave', () => { mv = null; hideTip(); });
+  view.addEventListener('pointerleave', e => { if (e.pointerType !== 'mouse') return; mv = null; hideTip(); });   // touch fires 'leave' right after every tap
 
   /* ---------- drag to turn (roll) ---------- */
   let turn = null;
@@ -219,7 +220,9 @@ html.light #noseDemo .nd-reset{color:#1f56c9;background:rgba(255,255,255,.8);bor
     if (Math.abs(dx) + Math.abs(dy) > 6) turn.moved = true;
     if (turn.moved && state.phase === 'idle') state.roll = turn.r + (upright ? dx : -dy) * .012; });
   addEventListener('pointerup', e => {
-    if (turn && !turn.moved && touch && !drag) { const k = pick(e.clientX, e.clientY); if (k) { setHover(k); showTip(k, e.clientX, e.clientY); } else hideTip(); }
+    if (turn && !turn.moved && touch && !drag) { let k = pick(e.clientX, e.clientY);
+      for (const [ox, oy] of [[14, 0], [-14, 0], [0, 14], [0, -14], [26, 0], [-26, 0]]) { if (k) break; k = pick(e.clientX + ox, e.clientY + oy); }   // forgiving taps on a thin rocket
+      if (k) { setHover(k); showTip(k, e.clientX, e.clientY); } else hideTip(); }
     turn = null; });
 
   /* ---------- drag the board in ---------- */
