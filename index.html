@@ -984,7 +984,7 @@ html.light .ride-again{color:#1e2a44}
         <div class="cad-canvas-wrap"><canvas id="cadCanvas5"></canvas></div>
         <div class="cad-info">
           <h3 class="cad-title">EG Ghost</h3>
-          <p class="cad-desc">Ghost character modeled and colored in Blender</p>
+          <p class="cad-desc">Ghost character modeled and colored in Blender, made as a Halloween giveaway for my EG1004 students</p>
           <span class="cad-badge">Blender · GLB</span>
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
         </div>
@@ -1853,13 +1853,20 @@ document.addEventListener('keydown', e => {
     const cadTheme=()=>{const pk=document.documentElement.classList.contains('light');
       mat.color.setHex(pk?0x5a6a86:0x7ab0d0); mat.emissive.setHex(pk?0x000000:0x0a1525); mat.metalness=pk?.25:.55; mat.roughness=pk?.55:.35;
       dl1.color.setHex(pk?0xffffff:0x4fa3ff); dl1.intensity=pk?1.6:3; dl2.color.setHex(pk?0x6f9cf2:0x80c8ff); dl2.intensity=pk?1.2:1.5;
-      if(glb){ dl1.color.setHex(0xffffff); dl1.intensity=pk?1.5:1.7; dl2.color.setHex(0xcfe0ff); dl2.intensity=.7; }
-      scene.children.forEach(o=>{ if(o.isAmbientLight){o.color.setHex(glb?0xffffff:pk?0x6a7890:0x334466); o.intensity=glb?(pk?.7:.55):pk?.9:1.8;} if(o.isHemisphereLight){o.color.setHex(glb?0xffffff:pk?0xf0f5ff:0x112244); o.intensity=glb?.6:pk?.5:1;} });};
+      if(glb){ dl1.color.setHex(0xffffff); dl1.intensity=pk?1.15:1.1; dl2.color.setHex(0xcfe0ff); dl2.intensity=.5;
+        glb.traverse(o=>{ if(o.isMesh&&o.userData.ghostBody) o.material.color.setHex(pk?0xd9e2f2:0xe9eef7).convertSRGBToLinear(); }); }
+      scene.children.forEach(o=>{ if(o.isAmbientLight){o.color.setHex(glb?0xffffff:pk?0x6a7890:0x334466); o.intensity=glb?(pk?.45:.35):pk?.9:1.8;} if(o.isHemisphereLight){o.color.setHex(glb?0xffffff:pk?0xf0f5ff:0x112244); o.intensity=glb?.45:pk?.5:1;} });};
     cadTheme(); new MutationObserver(cadTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
     let box, sz, cx, cy, cz, mesh;
     if (glb) {
       renderer.outputEncoding = T.sRGBEncoding;
+      glb.traverse(o => { if (!o.isMesh) return; const g = o.geometry, small = g.attributes.position.count < 400;   // boxy bits (sign, letters) stay crisp, the rest smooth
+        if (!g.attributes.normal) g.computeVertexNormals();
+        o.material = o.material.clone(); o.material.flatShading = small;
+        if (o.material.transparent) { o.userData.ghostBody = !small; o.material.color.setRGB(1, 1, 1); o.material.opacity = small ? 1 : .92; o.material.transparent = !small; o.material.roughness = .45; }   // ghost body: soft white, lettering solid
+        o.material.needsUpdate = true; });
+      cadTheme();
       const b = new T.Box3().setFromObject(glb), c = b.getCenter(new T.Vector3()), s3 = b.getSize(new T.Vector3());
       sz = Math.max(s3.x, s3.y, s3.z); mesh = glb; mesh.position.sub(c);
     } else {
