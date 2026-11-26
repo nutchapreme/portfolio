@@ -1980,7 +1980,7 @@ document.addEventListener('keydown', e => {
           .then(b => cadViewer('cadCanvas4', 0, b))
           .catch(() => { msg.style.display = 'flex'; msg.textContent = 'Add baby_rocket.stl next to index.html to show the 3D model'; });
         if (T.GLTFLoader) new T.GLTFLoader().load('img/eg_ghost.glb', g => cadViewer('cadCanvas5', 0, null, g.scene));
-        if (T.GLTFLoader) new T.GLTFLoader().load('img/disco.glb', g => cadViewer('cadCanvas6', 0, null, g.scene));
+        if (T.GLTFLoader) new T.GLTFLoader().load('disco.glb', g => cadViewer('cadCanvas6', 0, null, g.scene));
       },50);
     }
   };
