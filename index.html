@@ -1002,7 +1002,7 @@ html.light .ride-again{color:#1e2a44}
       <div class="cad-card">
         <div class="cad-canvas-wrap"><canvas id="cadCanvas6"></canvas></div>
         <div class="cad-info">
-          <h3 class="cad-title">Disco Candy</h3>
+          <h3 class="cad-title">Disco Ball</h3>
           <p class="cad-desc">Color experiment in Blender</p>
           <span class="cad-badge">Blender · GLB</span>
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
@@ -1980,7 +1980,29 @@ document.addEventListener('keydown', e => {
           .then(b => cadViewer('cadCanvas4', 0, b))
           .catch(() => { msg.style.display = 'flex'; msg.textContent = 'Add baby_rocket.stl next to index.html to show the 3D model'; });
         if (T.GLTFLoader) new T.GLTFLoader().load('img/eg_ghost.glb', g => cadViewer('cadCanvas5', 0, null, g.scene));
-        if (T.GLTFLoader) new T.GLTFLoader().load('disco.glb', g => cadViewer('cadCanvas6', 0, null, g.scene));
+        // disco ball: the web has no Blender "world" to reflect, so give it a fake mirror-tile room
+        const discoEnv = () => {
+          const pal = ['#ffffff','#dfe8f5','#9fb7d9','#5b86c9','#2d5fa8','#1a2a44','#0b1424','#6b7a52','#c9b48a'];
+          const faces = [];
+          for (let f = 0; f < 6; f++) {
+            const c = document.createElement('canvas'); c.width = c.height = 128;
+            const x = c.getContext('2d'), n = 8, s = 128 / n;
+            for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+              x.fillStyle = pal[(Math.random() * pal.length) | 0]; x.fillRect(i * s, j * s, s, s);
+            }
+            faces.push(c);
+          }
+          const t = new T.CubeTexture(faces); t.needsUpdate = true; return t;
+        };
+        if (T.GLTFLoader) new T.GLTFLoader().load('disco.glb', g => {
+          cadViewer('cadCanvas6', 0, null, g.scene);
+          const env = discoEnv();
+          g.scene.traverse(o => { if (!o.isMesh) return;
+            o.material.envMap = env; o.material.envMapIntensity = 1.5;
+            o.material.color.setHex(0xe6eef8); o.material.metalness = 1; o.material.roughness = .12;
+            o.material.flatShading = true;   // each facet = one mirror tile
+            o.material.needsUpdate = true; });
+        });
       },50);
     }
   };
