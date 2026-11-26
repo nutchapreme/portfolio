@@ -1982,14 +1982,26 @@ document.addEventListener('keydown', e => {
         if (T.GLTFLoader) new T.GLTFLoader().load('img/eg_ghost.glb', g => cadViewer('cadCanvas5', 0, null, g.scene));
         // disco ball: the web has no Blender "world" to reflect, so give it a fake mirror-tile room
         const discoEnv = () => {
-          const pal = ['#ffffff','#dfe8f5','#9fb7d9','#5b86c9','#2d5fa8','#1a2a44','#0b1424','#6b7a52','#c9b48a'];
+          // weighted palette like the Blender look: mostly dark navy/charcoal, some blues, a few highlights
+          const dark  = ['#0b1220','#111b2c','#16243a','#1c2c44','#22344f','#2a3a4c','#1a2230'];
+          const blue  = ['#2d5fa8','#3a72c4','#4a86d4','#5b7fa8','#3b5e86'];
+          const light = ['#c8d6e8','#9fb7d9','#e8eef6'];
+          const odd   = ['#5f6b45','#7a7a52','#8a7a5a','#3f5a5a'];   // olive / teal hints
+          const pick = (top, bottom) => { const r = Math.random();
+            const lt = top ? .30 : .08, bl = bottom ? .40 : .20;
+            const set = r < lt ? light : r < lt + bl ? blue : r < lt + bl + .07 ? odd : dark;
+            return set[(Math.random() * set.length) | 0]; };
           const faces = [];
-          for (let f = 0; f < 6; f++) {
-            const c = document.createElement('canvas'); c.width = c.height = 128;
-            const x = c.getContext('2d'), n = 8, s = 128 / n;
+          for (let f = 0; f < 6; f++) {   // order: +x, -x, +y (top), -y (bottom), +z, -z
+            const c = document.createElement('canvas'); c.width = c.height = 192;
+            const x = c.getContext('2d'), n = 12, s = 192 / n;
             for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
-              x.fillStyle = pal[(Math.random() * pal.length) | 0]; x.fillRect(i * s, j * s, s, s);
+              x.fillStyle = pick(f === 2, f === 3); x.fillRect(i * s, j * s, s, s);
             }
+            // fine speckle grain, like the noise in Blender
+            const img = x.getImageData(0, 0, 192, 192), d = img.data;
+            for (let k = 0; k < d.length; k += 4) { const v = (Math.random() - .5) * 26; d[k] += v; d[k+1] += v; d[k+2] += v; }
+            x.putImageData(img, 0, 0);
             faces.push(c);
           }
           const t = new T.CubeTexture(faces); t.needsUpdate = true; return t;
@@ -1998,8 +2010,8 @@ document.addEventListener('keydown', e => {
           cadViewer('cadCanvas6', 0, null, g.scene);
           const env = discoEnv();
           g.scene.traverse(o => { if (!o.isMesh) return;
-            o.material.envMap = env; o.material.envMapIntensity = 1.5;
-            o.material.color.setHex(0xe6eef8); o.material.metalness = 1; o.material.roughness = .12;
+            o.material.envMap = env; o.material.envMapIntensity = 1.0;
+            o.material.color.setHex(0xaebccd); o.material.metalness = 1; o.material.roughness = .18;
             o.material.flatShading = true;   // each facet = one mirror tile
             o.material.needsUpdate = true; });
         });
