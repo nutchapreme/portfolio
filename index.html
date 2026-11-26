@@ -1983,13 +1983,14 @@ document.addEventListener('keydown', e => {
         // disco ball: the web has no Blender "world" to reflect, so give it a fake mirror-tile room
         const discoEnv = () => {
           // weighted palette like the Blender look: mostly dark navy/charcoal, some blues, a few highlights
-          const dark  = ['#0b1220','#111b2c','#16243a','#1c2c44','#22344f','#2a3a4c','#1a2230'];
-          const blue  = ['#2d5fa8','#3a72c4','#4a86d4','#5b7fa8','#3b5e86'];
-          const light = ['#c8d6e8','#9fb7d9','#e8eef6'];
-          const odd   = ['#5f6b45','#7a7a52','#8a7a5a','#3f5a5a'];   // olive / teal hints
+          // flashy but not blown out: deep navy + saturated blues + crisp white glints, no grays
+          const dark  = ['#060d1f','#0a1a3a','#0f2452','#132b66'];
+          const blue  = ['#1e5bd8','#2f74f0','#3d8bff','#5aa2ff','#1a4fb8','#2b66c9'];
+          const light = ['#ffffff','#e6f0ff','#bcd8ff'];
+          const odd   = ['#ffe3a0','#9fe3d6','#c9b8ff'];   // small gold / teal / lilac glints
           const pick = (top, bottom) => { const r = Math.random();
-            const lt = top ? .30 : .08, bl = bottom ? .40 : .20;
-            const set = r < lt ? light : r < lt + bl ? blue : r < lt + bl + .07 ? odd : dark;
+            const lt = top ? .32 : .18, bl = bottom ? .48 : .40;
+            const set = r < lt ? light : r < lt + bl ? blue : r < lt + bl + .06 ? odd : dark;
             return set[(Math.random() * set.length) | 0]; };
           const faces = [];
           for (let f = 0; f < 6; f++) {   // order: +x, -x, +y (top), -y (bottom), +z, -z
@@ -2000,7 +2001,7 @@ document.addEventListener('keydown', e => {
             }
             // fine speckle grain, like the noise in Blender
             const img = x.getImageData(0, 0, 192, 192), d = img.data;
-            for (let k = 0; k < d.length; k += 4) { const v = (Math.random() - .5) * 26; d[k] += v; d[k+1] += v; d[k+2] += v; }
+            for (let k = 0; k < d.length; k += 4) { const v = (Math.random() - .5) * 12; d[k] += v; d[k+1] += v; d[k+2] += v; }
             x.putImageData(img, 0, 0);
             faces.push(c);
           }
@@ -2010,8 +2011,8 @@ document.addEventListener('keydown', e => {
           cadViewer('cadCanvas6', 0, null, g.scene);
           const env = discoEnv();
           g.scene.traverse(o => { if (!o.isMesh) return;
-            o.material.envMap = env; o.material.envMapIntensity = 1.0;
-            o.material.color.setHex(0xaebccd); o.material.metalness = 1; o.material.roughness = .18;
+            o.material.envMap = env; o.material.envMapIntensity = 1.25;
+            o.material.color.setHex(0xdde7f5); o.material.metalness = 1; o.material.roughness = .12;
             o.material.flatShading = true;   // each facet = one mirror tile
             o.material.needsUpdate = true; });
         });
