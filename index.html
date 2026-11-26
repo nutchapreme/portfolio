@@ -588,7 +588,7 @@ html.light .art-tabs{gap:8px}
 /* CAD: all 4 cards fit in one row on desktop — no hidden cards, no scrolling */
 @media(min-width:901px){.cad-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible!important;cursor:auto!important}.cad-card{flex:none!important;min-width:0}.cad-canvas-wrap{height:230px}}
 .cad-more{display:none!important}
-@media(min-width:1100px){.cad-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:18px!important}.cad-canvas-wrap{height:210px}}
+@media(min-width:1100px){.cad-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important}.cad-canvas-wrap{height:210px}}
 
 /* resume download button readable in light mode */
 html.light .rm-btn.solid{background:#2f6fe8!important;color:#fff!important;border-color:#2f6fe8!important}
@@ -994,6 +994,16 @@ html.light .ride-again{color:#1e2a44}
         <div class="cad-info">
           <h3 class="cad-title">EG Ghost</h3>
           <p class="cad-desc">Ghost character modeled and colored in Blender, made as a Halloween giveaway for my EG1004 students</p>
+          <span class="cad-badge">Blender · GLB</span>
+          <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
+        </div>
+      </div>
+
+      <div class="cad-card">
+        <div class="cad-canvas-wrap"><canvas id="cadCanvas6"></canvas></div>
+        <div class="cad-info">
+          <h3 class="cad-title">Disco Candy</h3>
+          <p class="cad-desc">Color experiment in Blender</p>
           <span class="cad-badge">Blender · GLB</span>
           <p class="cad-hint">↖ Drag to rotate · Scroll to zoom</p>
         </div>
@@ -1970,6 +1980,7 @@ document.addEventListener('keydown', e => {
           .then(b => cadViewer('cadCanvas4', 0, b))
           .catch(() => { msg.style.display = 'flex'; msg.textContent = 'Add baby_rocket.stl next to index.html to show the 3D model'; });
         if (T.GLTFLoader) new T.GLTFLoader().load('img/eg_ghost.glb', g => cadViewer('cadCanvas5', 0, null, g.scene));
+        if (T.GLTFLoader) new T.GLTFLoader().load('img/disco.glb', g => cadViewer('cadCanvas6', 0, null, g.scene));
       },50);
     }
   };
